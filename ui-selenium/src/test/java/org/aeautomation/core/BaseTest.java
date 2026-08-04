@@ -8,6 +8,9 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 
+import java.util.Objects;
+import java.util.stream.Stream;
+
 /**
  * Base Test class managing the lifecycle of WebDriver instances via TestNG hooks.
  * Serves as the foundation for all test classes in the framework.
@@ -17,22 +20,27 @@ public abstract class BaseTest {
     /**
      * Initializes a thread-safe WebDriver instance prior to each test execution.
      *
-     * Browser resolution order of precedence:
-     **TestNG XML Parameter (supplied via {@code testng.xml} suite files)</li>
-     **CLI System Property (supplied via Maven: {@code -Dbrowser=FIREFOX})</li>
-     **Default value defined in {@code config.properties}</li>
-     * </ol>
+     * Browser resolution order:
+     * 1. CLI system property (-Dbrowser=FIREFOX)
+     * 2. TestNG XML parameter
+     * 3. Default from config.properties
      *
      * @param xmlBrowser Browser parameter optionally injected from testng.xml.
      */
     @BeforeMethod(alwaysRun = true)
     @Parameters({"browser"})
     public void setUp(@Optional String xmlBrowser) {
-        String browserName = (xmlBrowser != null && !xmlBrowser.isEmpty())
-                ? xmlBrowser
-                : ConfigReader.getBrowser();
+        String resolvedBrowser = Stream.of(
+                        System.getProperty("browser"),
+                        xmlBrowser
+                )
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(b -> !b.isEmpty())
+                .findFirst()
+                .orElseGet(ConfigReader::getBrowser);
 
-        BrowserType browserType = resolveBrowserType(browserName);
+        BrowserType browserType = resolveBrowserType(resolvedBrowser);
         DriverFactory.initDriver(browserType);
     }
 
