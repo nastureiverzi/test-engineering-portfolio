@@ -19,12 +19,13 @@ This repository demonstrates practical skills in:
 
 ## Repository Structure
 
+```text
 test-engineering-portfolio/
 ├── manual-testing/    # Test cases and bug reports
 ├── ui-selenium/       # UI automation — Java 17, Selenium 4, TestNG
 ├── ui-playwright/     # UI automation — JavaScript, Playwright
 └── api-testing/       # API testing — Postman and Supertest
-
+```
 ---
 
 ## Projects
@@ -64,8 +65,12 @@ test-engineering-portfolio/
 
 Each project is self-contained with its own setup instructions.
 
-- `ui-selenium/` — `mvn test`
-- `ui-playwright/` — `npx playwright test`
-- `api-testing/`
+`ui-selenium/` — `mvn test`
+  - Custom browser:    `mvn test -Dbrowser=FIREFOX`
+  - Headless mode:     `mvn test -Dheadless=true`
+  - Target environment:`mvn test -DbaseUrl=https://staging.myapp.com`
+  - Combined:          `mvn test -Dbrowser=FIREFOX -Dheadless=true -DbaseUrl=https://staging.myapp.com`
+`ui-playwright/` — `npx playwright test`
+`api-testing/`
   - Supertest: `npm test`
   - Postman: import collection from `collections/`
