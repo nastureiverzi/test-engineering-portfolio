@@ -65,7 +65,7 @@ test-engineering-portfolio/
 
 Each project is self-contained with its own setup instructions.
 
-**ui-selenium/**
+`ui-selenium/`
 ```bash
 mvn test                                                          # default (Chrome)
 mvn test -Dbrowser=FIREFOX                                        # custom browser
@@ -73,11 +73,11 @@ mvn test -Dheadless=true                                          # headless mod
 mvn test -Dbrowser=FIREFOX -Dheadless=true                        # combined
 ```
 
-**ui-playwright/**
+`ui-playwright/`
 ```bash
 npx playwright test
 ```
 
-**api-testing/**
+`api-testing/`
 - Supertest: `npm test`
 - Postman: import collection from `collections/`
