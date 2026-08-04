@@ -65,12 +65,19 @@ test-engineering-portfolio/
 
 Each project is self-contained with its own setup instructions.
 
-`ui-selenium/` — `mvn test`
-  - Custom browser:    `mvn test -Dbrowser=FIREFOX`
-  - Headless mode:     `mvn test -Dheadless=true`
-  - Target environment:`mvn test -DbaseUrl=https://staging.myapp.com`
-  - Combined:          `mvn test -Dbrowser=FIREFOX -Dheadless=true -DbaseUrl=https://staging.myapp.com`
-`ui-playwright/` — `npx playwright test`
-`api-testing/`
-  - Supertest: `npm test`
-  - Postman: import collection from `collections/`
+**ui-selenium/**
+```bash
+mvn test                                                          # default (Chrome)
+mvn test -Dbrowser=FIREFOX                                        # custom browser
+mvn test -Dheadless=true                                          # headless mode
+mvn test -Dbrowser=FIREFOX -Dheadless=true                        # combined
+```
+
+**ui-playwright/**
+```bash
+npx playwright test
+```
+
+**api-testing/**
+- Supertest: `npm test`
+- Postman: import collection from `collections/`
