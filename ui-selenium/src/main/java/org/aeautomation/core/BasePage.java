@@ -1,6 +1,6 @@
 package org.aeautomation.core;
 
-import org.aeautomation.config.ConfigReader;
+import org.aeautomation.utils.ConfigReader;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -42,7 +42,7 @@ public abstract class BasePage {
      * @param locator By locator strategy
      */
     protected void click(By locator) {
-        waitForVisibility(locator).click();
+        waitForClickability(locator).click();
     }
 
     /**
@@ -101,6 +101,16 @@ public abstract class BasePage {
      */
     protected WebElement waitForVisibility(By locator) {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
+
+    /**
+     * Waits until the element is present in the DOM, visible on screen, and enabled for interaction.
+     *
+     * @param locator By locator strategy
+     * @return Clickable WebElement
+     */
+    protected WebElement waitForClickability(By locator) {
+        return wait.until(ExpectedConditions.elementToBeClickable(locator));
     }
 
     /**
