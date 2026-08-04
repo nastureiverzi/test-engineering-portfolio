@@ -67,10 +67,11 @@ Each project is self-contained with its own setup instructions.
 
 `ui-selenium/`
 ```bash
-mvn test                                                          # default (Chrome)
-mvn test -Dbrowser=FIREFOX                                        # custom browser
-mvn test -Dheadless=true                                          # headless mode
-mvn test -Dbrowser=FIREFOX -Dheadless=true                        # combined
+mvn test                                                # default (Chrome)
+mvn test -Dbrowser=FIREFOX                              # custom browser
+mvn test -Dheadless=true                                # headless mode
+mvn test -DbaseUrl=https://staging.myapp.com            # custom base URL
+mvn test -Dbrowser=FIREFOX -Dheadless=true -DbaseUrl=https://staging.myapp.com  # combined
 ```
 
 `ui-playwright/`
