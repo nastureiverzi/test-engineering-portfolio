@@ -1,5 +1,6 @@
 package org.aeautomation.core;
 
+import org.aeautomation.utils.ConfigReader;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -94,6 +95,6 @@ public final class DriverFactory {
     }
 
     private static boolean isHeadless() {
-        return Boolean.parseBoolean(System.getProperty("headless", "false"));
+        return ConfigReader.isHeadless();
     }
 }

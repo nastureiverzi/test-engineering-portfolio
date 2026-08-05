@@ -30,16 +30,7 @@ public abstract class BaseTest {
     @BeforeMethod(alwaysRun = true)
     @Parameters({"browser"})
     public void setUp(@Optional String xmlBrowser) {
-        String resolvedBrowser = Stream.of(
-                        System.getProperty("browser"),
-                        xmlBrowser
-                )
-                .filter(Objects::nonNull)
-                .map(String::trim)
-                .filter(b -> !b.isEmpty())
-                .findFirst()
-                .orElseGet(ConfigReader::getBrowser);
-
+        String resolvedBrowser = ConfigReader.getBrowser(xmlBrowser);
         BrowserType browserType = resolveBrowserType(resolvedBrowser);
         DriverFactory.initDriver(browserType);
     }

@@ -2,7 +2,9 @@ package org.aeautomation.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 /**
  * Utility class responsible for loading framework configurations.
@@ -32,45 +34,24 @@ public final class ConfigReader {
     private ConfigReader() {}
 
     /**
-     * Resolves a property key by checking System Properties (CLI overrides) first,
-     * falling back to values declared in config.properties.
+     * Property getter that resolves configuration values based on strict priority.
      *
-     * @param key The key to look up
-     * @return Resolved property value or null if not found
+     * @param key            The property key to resolve
+     * @param optionalValues Optional runtime parameter fallbacks
+     * @return Resolved property value string
+     * @throws IllegalArgumentException if the property key is missing across all configuration sources
      */
-    public static String getProperty(String key) {
-        // 1. Check command line argument (-Dkey=value)
-        String systemProperty = System.getProperty(key);
-        if (systemProperty != null && !systemProperty.trim().isEmpty()) {
-            return systemProperty.trim();
-        }
-
-        // 2. Fall back to config.properties file value
-        String fileProperty = properties.getProperty(key);
-        return (fileProperty != null) ? fileProperty.trim() : null;
-    }
-
-    /**
-     * Gets the target Base URL for the environment under test.
-     *
-     * @return Target environment URL string
-     */
-    public static String getBaseUrl() {
-        String url = getProperty("baseUrl");
-        if (url == null || url.isEmpty()) {
-            throw new IllegalStateException("Property 'baseUrl' is missing or empty in config.properties");
-        }
-        return url;
-    }
-
-    /**
-     * Gets the default browser specified for local test runs.
-     *
-     * @return Browser name string (defaults to "CHROME" if unspecified)
-     */
-    public static String getBrowser() {
-        String browser = getProperty("browser");
-        return (browser != null && !browser.isEmpty()) ? browser : "CHROME";
+    public static String getProperty(String key, String... optionalValues) {
+        return Stream.concat(
+                        Stream.of(System.getProperty(key), properties.getProperty(key)),
+                        Stream.of(optionalValues)
+                )
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(val -> !val.isEmpty())
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Property key '" + key + "' was not found in System properties, config.properties, or optional parameters!"));
     }
 
     /**
@@ -79,9 +60,8 @@ public final class ConfigReader {
      * @return Timeout duration in seconds (defaults to 10 seconds if unspecified)
      */
     public static int getTimeout() {
-        String timeoutStr = getProperty("timeout");
         try {
-            return (timeoutStr != null) ? Integer.parseInt(timeoutStr) : 10;
+            return Integer.parseInt(getProperty("timeout"));
         } catch (NumberFormatException e) {
             System.err.println("Invalid 'timeout' value in configuration. Defaulting to 10 seconds.");
             return 10;
@@ -89,11 +69,57 @@ public final class ConfigReader {
     }
 
     /**
-     * Gets whether browser execution should run in headless mode.
+     * Retrieves the target browser for test execution, allowing an optional TestNG XML override.
      *
-     * @return True if headless execution is requested, false otherwise
+     * @param xmlBrowser Browser parameter optionally injected from testng.xml
+     * @return Resolved browser string
+     */
+    public static String getBrowser(String xmlBrowser) {
+        return getProperty("browser", xmlBrowser);
+    }
+
+    /**
+     * Retrieves the target browser for test execution using the standard priority hierarchy.
+     *
+     * @return Resolved browser string
+     */
+    public static String getBrowser() {
+        return getProperty("browser");
+    }
+
+    /**
+     * Retrieves the target application base URL for navigating test environments.
+     *
+     * @return Base URL string
+     */
+    public static String getBaseUrl() {
+        return getProperty("baseUrl");
+    }
+
+    /**
+     * Determines whether browser execution should run in headless mode.
+     *
+     * @return true if 'headless' property is set to "true", otherwise false
      */
     public static boolean isHeadless() {
         return Boolean.parseBoolean(getProperty("headless"));
+    }
+
+    /**
+     * Retrieves the pre-existing user email
+     *
+     * @return Registered user email string
+     */
+    public static String getExistingUserEmail() {
+        return getProperty("existing.user.email");
+    }
+
+    /**
+     * Retrieves pre-existing username
+     *
+     * @return Registered username string
+     */
+    public static String getExistingUsername() {
+        return getProperty("existing.user.name");
     }
 }

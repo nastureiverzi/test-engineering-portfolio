@@ -2,6 +2,7 @@ package org.aeautomation.tests;
 
 import org.aeautomation.core.BaseTest;
 import org.aeautomation.pages.*;
+import org.aeautomation.utils.ConfigReader;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -96,5 +97,49 @@ public class RegisterUserTest extends BaseTest {
         // 13. Verify 'Logged in as username' is visible
         Assert.assertTrue(homePage.isLoggedInAsDisplayed(name),
                 "Logged in as username was not displayed on home page.");
+    }
+
+    /**
+     * TC-002: Registration with already registered email
+     * <p>
+     * Pre-conditions:
+     * - User is not logged in
+     * - Email is already registered
+     * <p>
+     * Steps:
+     * 1. Navigate to home page.
+     * 2. Click 'Signup / Login'.
+     * 3. Enter username and an already registered email.
+     * 4. Click 'Signup'.
+     * <p>
+     * Expected Result:
+     * - Red error message is displayed indicating email already exists.
+     * - User remains on the registration page.
+     */
+    @Test(description = "TC-002: Registration with already registered email")
+    public void testRegisterWithExistingEmail() {
+        // --- Test Data Initialization ---
+        String username = ConfigReader.getExistingUsername();
+        String existingEmail = ConfigReader.getExistingUserEmail();
+        String expectedErrorMessage = "Email Address already exist!";
+        String expectedSignupHeader = "New User Signup!";
+
+        // Step 1: Navigate to home page
+        HomePage homePage = new HomePage();
+        homePage.open();
+
+        // Step 2: Click "Signup / Login" in top navigation menu
+        SignupLoginPage signupLoginPage = homePage.clickSignupLogin();
+
+        // Steps 3 & 4: Enter username and already registered email, then click "Signup"
+        signupLoginPage.submitSignupExpectingFailure(username, existingEmail);
+
+        // Expected Result 1: Red error message is displayed below signup form
+        Assert.assertEquals(signupLoginPage.getSignupErrorMessage(), expectedErrorMessage,
+                "Signup error message mismatch for existing email.");
+
+        // Expected Result 2: User remains on the signup/login page
+        Assert.assertEquals(signupLoginPage.getSignupHeaderText(), expectedSignupHeader,
+                "User was not kept on the signup page after invalid registration attempt.");
     }
 }
