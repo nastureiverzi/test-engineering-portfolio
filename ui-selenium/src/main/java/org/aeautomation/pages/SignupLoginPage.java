@@ -24,6 +24,9 @@ public class SignupLoginPage extends BasePage {
     private final By loginPasswordInput = By.xpath("//input[@data-qa='login-password']");
     private final By loginButton = By.xpath("//button[@data-qa='login-button']");
 
+    public static final String SIGNUP_HEADER_TEXT = "New User Signup!";
+    public static final String EXISTING_EMAIL_ERROR_TEXT = "Email Address already exist!";
+
     /**
      * Retrieves the text header from the "New User Signup!" section.
      *

@@ -12,6 +12,8 @@ public class AccountCreatedPage extends BasePage {
     private final By accountCreatedHeader = By.xpath("//b[contains(text(),'Account Created!')]");
     private final By continueButton = By.xpath("//a[@data-qa='continue-button']");
 
+    public static final String HEADER_TEXT = "ACCOUNT CREATED!";
+
     /**
      * Retrieves the text from the account creation confirmation header.
      *

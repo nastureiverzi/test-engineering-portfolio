@@ -1,8 +1,10 @@
 package org.aeautomation.tests;
 
 import org.aeautomation.core.BaseTest;
+import org.aeautomation.data.UserRegistrationData;
 import org.aeautomation.pages.*;
 import org.aeautomation.utils.ConfigReader;
+import org.aeautomation.utils.TestDataManager;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -28,26 +30,9 @@ public class RegisterUserTest extends BaseTest {
     @Test(description = "Test Case 1: Register User successfully and cleanup account")
     public void testRegisterUser() {
         // --- Test Data Initialization ---
-        String name = "TestUser";
+        UserRegistrationData userData = TestDataManager.getObject("userRegistration", UserRegistrationData.class);
         String email = "qa_" + System.currentTimeMillis() + "@example.com"; // Dynamic email to prevent collisions
         String password = "Password123!";
-
-        // Date of Birth
-        String dobDay = "15";
-        String dobMonth = "May";
-        String dobYear = "1995";
-
-        // Personal & Address Details
-        String firstName = "Test";
-        String lastName = "User";
-        String company = "Acme Inc";
-        String address1 = "123 Main St";
-        String address2 = "Apt 4B";
-        String country = "United States";
-        String state = "California";
-        String city = "Los Angeles";
-        String zipcode = "90210";
-        String mobileNumber = "1234567890";
 
         // Expected Headers & Strings
         String expectedSignupHeader = "New User Signup!";
@@ -65,37 +50,33 @@ public class RegisterUserTest extends BaseTest {
         SignupLoginPage signupLoginPage = homePage.clickSignupLogin();
 
         // 4. Verify 'New User Signup!' is visible
-        Assert.assertEquals(signupLoginPage.getSignupHeaderText(), expectedSignupHeader,
+        Assert.assertEquals(signupLoginPage.getSignupHeaderText(), SignupLoginPage.SIGNUP_HEADER_TEXT,
                 "Signup header text mismatch.");
 
         // 5. Enter name, email address, and click 'Signup' button
-        AccountInformationPage infoPage = signupLoginPage.submitSignup(name, email);
+        AccountInformationPage infoPage = signupLoginPage.submitSignup(userData.name(), email);
 
         // 6. Verify 'ENTER ACCOUNT INFORMATION' is visible
-        Assert.assertEquals(infoPage.getPageHeaderText().toUpperCase(), expectedAccountInfoHeader,
+        Assert.assertEquals(infoPage.getPageHeaderText().toUpperCase(), AccountInformationPage.HEADER_TEXT,
                 "Account information page header mismatch.");
 
         // 7 - 10. Fill details and click 'Create Account' button
         AccountCreatedPage createdPage = infoPage.selectTitleMr()
-                .enterPassword(password)
-                .selectDateOfBirth(dobDay, dobMonth, dobYear)
+                .enterPassword(userData.password())
+                .selectDateOfBirth(userData.dobDay(), userData.dobMonth(), userData.dobYear())
                 .selectNewsletterAndOffers()
-                .fillAddressDetails(
-                        firstName, lastName, company,
-                        address1, address2, country,
-                        state, city, zipcode, mobileNumber
-                )
+                .fillAddressDetails(userData)
                 .clickCreateAccount();
 
         // 11. Verify 'ACCOUNT CREATED!' is visible
-        Assert.assertEquals(createdPage.getHeaderText().toUpperCase(), expectedAccountCreatedHeader,
+        Assert.assertEquals(createdPage.getHeaderText().toUpperCase(), AccountCreatedPage.HEADER_TEXT,
                 "Account created text mismatch.");
 
         // 12. Click 'Continue' button
         homePage = createdPage.clickContinue();
 
         // 13. Verify 'Logged in as username' is visible
-        Assert.assertTrue(homePage.isLoggedInAsDisplayed(name),
+        Assert.assertTrue(homePage.isLoggedInAsDisplayed(userData.name()),
                 "Logged in as username was not displayed on home page.");
     }
 
@@ -119,10 +100,8 @@ public class RegisterUserTest extends BaseTest {
     @Test(description = "TC-002: Registration with already registered email")
     public void testRegisterWithExistingEmail() {
         // --- Test Data Initialization ---
-        String username = ConfigReader.getExistingUsername();
-        String existingEmail = ConfigReader.getExistingUserEmail();
-        String expectedErrorMessage = "Email Address already exist!";
-        String expectedSignupHeader = "New User Signup!";
+        String username = TestDataManager.get("existingUser.name");
+        String email = TestDataManager.get("existingUser.email");
 
         // Step 1: Navigate to home page
         HomePage homePage = new HomePage();
@@ -132,14 +111,14 @@ public class RegisterUserTest extends BaseTest {
         SignupLoginPage signupLoginPage = homePage.clickSignupLogin();
 
         // Steps 3 & 4: Enter username and already registered email, then click "Signup"
-        signupLoginPage.submitSignupExpectingFailure(username, existingEmail);
+        signupLoginPage.submitSignupExpectingFailure(username, email);
 
         // Expected Result 1: Red error message is displayed below signup form
-        Assert.assertEquals(signupLoginPage.getSignupErrorMessage(), expectedErrorMessage,
+        Assert.assertEquals(signupLoginPage.getSignupErrorMessage(), SignupLoginPage.EXISTING_EMAIL_ERROR_TEXT,
                 "Signup error message mismatch for existing email.");
 
         // Expected Result 2: User remains on the signup/login page
-        Assert.assertEquals(signupLoginPage.getSignupHeaderText(), expectedSignupHeader,
+        Assert.assertEquals(signupLoginPage.getSignupHeaderText(), SignupLoginPage.SIGNUP_HEADER_TEXT,
                 "User was not kept on the signup page after invalid registration attempt.");
     }
 }

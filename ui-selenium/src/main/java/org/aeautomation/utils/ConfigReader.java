@@ -106,20 +106,16 @@ public final class ConfigReader {
     }
 
     /**
-     * Retrieves the pre-existing user email
-     *
-     * @return Registered user email string
+     * Convenience method to retrieve a property parsed as a boolean.
      */
-    public static String getExistingUserEmail() {
-        return getProperty("existing.user.email");
+    public static boolean getBoolean(String key, String... optionalValues) {
+        return Boolean.parseBoolean(getProperty(key, optionalValues));
     }
 
     /**
-     * Retrieves pre-existing username
-     *
-     * @return Registered username string
+     * Convenience method to retrieve a property parsed as an integer (e.g. timeouts).
      */
-    public static String getExistingUsername() {
-        return getProperty("existing.user.name");
+    public static int getInt(String key, String... optionalValues) {
+        return Integer.parseInt(getProperty(key, optionalValues));
     }
 }

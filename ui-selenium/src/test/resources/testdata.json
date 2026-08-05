@@ -1,0 +1,23 @@
+{
+  "existingUser": {
+    "name": "testAccount",
+    "email": "testuser123.qa@gmail.com"
+  },
+  "userRegistration": {
+    "name": "TestUser",
+    "password": "Password123!",
+    "dobDay": "15",
+    "dobMonth": "May",
+    "dobYear": "1995",
+    "firstName": "Test",
+    "lastName": "User",
+    "company": "Acme Inc",
+    "address1": "123 Main St",
+    "address2": "Apt 4B",
+    "country": "United States",
+    "state": "California",
+    "city": "Los Angeles",
+    "zipcode": "90210",
+    "mobileNumber": "1234567890"
+  }
+}

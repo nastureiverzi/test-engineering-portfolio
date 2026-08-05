@@ -1,6 +1,7 @@
 package org.aeautomation.pages;
 
 import org.aeautomation.core.BasePage;
+import org.aeautomation.data.UserRegistrationData;
 import org.openqa.selenium.By;
 
 /**
@@ -30,6 +31,8 @@ public class AccountInformationPage extends BasePage {
     private final By zipcodeInput = By.id("zipcode");
     private final By mobileNumberInput = By.id("mobile_number");
     private final By createAccountButton = By.xpath("//button[@data-qa='create-account']");
+
+    public static final String HEADER_TEXT = "ENTER ACCOUNT INFORMATION";
 
     /**
      * Retrieves the text from the account information page header.
@@ -102,21 +105,17 @@ public class AccountInformationPage extends BasePage {
      * @param mobile       Mobile phone number
      * @return Current AccountInformationPage instance for method chaining
      */
-    public AccountInformationPage fillAddressDetails(
-            String firstName, String lastName, String company,
-            String address1, String address2, String country,
-            String state, String city, String zipcode, String mobile) {
-
-        type(firstNameInput, firstName);
-        type(lastNameInput, lastName);
-        type(companyInput, company);
-        type(address1Input, address1);
-        type(address2Input, address2);
-        selectByVisibleText(countryDropdown, country);
-        type(stateInput, state);
-        type(cityInput, city);
-        type(zipcodeInput, zipcode);
-        type(mobileNumberInput, mobile);
+    public AccountInformationPage fillAddressDetails(UserRegistrationData data) {
+        type(firstNameInput, data.firstName());
+        type(lastNameInput, data.lastName());
+        type(companyInput, data.company());
+        type(address1Input, data.address1());
+        type(address2Input, data.address2());
+        selectByVisibleText(countryDropdown, data.country());
+        type(stateInput, data.state());
+        type(cityInput, data.city());
+        type(zipcodeInput, data.zipcode());
+        type(mobileNumberInput, data.mobileNumber());
         return this;
     }
 
