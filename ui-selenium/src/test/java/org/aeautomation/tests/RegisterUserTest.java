@@ -96,4 +96,5 @@ public class RegisterUserTest extends BaseTest {
         // 13. Verify 'Logged in as username' is visible
         Assert.assertTrue(homePage.isLoggedInAsDisplayed(name),
                 "Logged in as username was not displayed on home page.");
+    }
 }
