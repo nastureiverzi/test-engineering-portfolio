@@ -1,7 +1,10 @@
 package org.aeautomation.pages;
 
 import org.aeautomation.core.BasePage;
+import org.aeautomation.utils.ConfigReader;
 import org.openqa.selenium.By;
+
+import java.util.Objects;
 
 /**
  * Page Object representing the "ACCOUNT CREATED!" confirmation screen.
@@ -29,7 +32,13 @@ public class AccountCreatedPage extends BasePage {
      * @return New instance of HomePage representing the authenticated session home view
      */
     public HomePage clickContinue() {
-        click(continueButton);
+        clickWithJS(continueButton);
+
+        // automationexercise.com occasionally serves fullscreen ads that hijack navigation.
+        // If detected, navigate directly to base URL to recover the session.
+        if (driver.getCurrentUrl().contains("#google_vignette")) {
+            driver.navigate().to(ConfigReader.getBaseUrl());
+        }
         return new HomePage();
     }
 }

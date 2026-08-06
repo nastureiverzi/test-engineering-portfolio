@@ -4,6 +4,7 @@ import org.aeautomation.core.BaseTest;
 import org.aeautomation.data.UserRegistrationData;
 import org.aeautomation.pages.*;
 import org.aeautomation.utils.ConfigReader;
+import org.aeautomation.utils.TestDataGenerator;
 import org.aeautomation.utils.TestDataManager;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -31,13 +32,7 @@ public class RegisterUserTest extends BaseTest {
     public void testRegisterUser() {
         // --- Test Data Initialization ---
         UserRegistrationData userData = TestDataManager.getObject("userRegistration", UserRegistrationData.class);
-        String email = "qa_" + System.currentTimeMillis() + "@example.com"; // Dynamic email to prevent collisions
-        String password = "Password123!";
-
-        // Expected Headers & Strings
-        String expectedSignupHeader = "New User Signup!";
-        String expectedAccountInfoHeader = "ENTER ACCOUNT INFORMATION";
-        String expectedAccountCreatedHeader = "ACCOUNT CREATED!";
+        String dynamicEmail = TestDataGenerator.generateEmail("qa");
 
         // 1. Launch browser & navigate to home page
         HomePage homePage = new HomePage();
@@ -54,7 +49,7 @@ public class RegisterUserTest extends BaseTest {
                 "Signup header text mismatch.");
 
         // 5. Enter name, email address, and click 'Signup' button
-        AccountInformationPage infoPage = signupLoginPage.submitSignup(userData.name(), email);
+        AccountInformationPage infoPage = signupLoginPage.submitSignup(userData.name(), dynamicEmail);
 
         // 6. Verify 'ENTER ACCOUNT INFORMATION' is visible
         Assert.assertEquals(infoPage.getPageHeaderText().toUpperCase(), AccountInformationPage.HEADER_TEXT,

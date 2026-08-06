@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Predicate;
@@ -23,9 +24,12 @@ public final class TestDataManager {
     }
 
     static {
-        try {
-            File jsonFile = new File("src/test/resources/testdata.json");
-            rootNode = objectMapper.readTree(jsonFile);
+        try (InputStream input = TestDataManager.class.getClassLoader()
+                .getResourceAsStream("testdata.json")) {
+            if (input == null) {
+                throw new IllegalStateException("testdata.json not found in classpath.");
+            }
+            rootNode = objectMapper.readTree(input);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load src/test/resources/testdata/testdata.json file.", e);
         }

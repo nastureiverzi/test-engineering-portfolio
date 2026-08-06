@@ -84,7 +84,7 @@ public final class ConfigReader {
      * @return Resolved browser string
      */
     public static String getBrowser() {
-        return getProperty("browser");
+        return getProperty("browser", "CHROME");
     }
 
     /**
@@ -102,7 +102,7 @@ public final class ConfigReader {
      * @return true if 'headless' property is set to "true", otherwise false
      */
     public static boolean isHeadless() {
-        return Boolean.parseBoolean(getProperty("headless"));
+        return Boolean.parseBoolean(getProperty("headless", "false"));
     }
 
     /**

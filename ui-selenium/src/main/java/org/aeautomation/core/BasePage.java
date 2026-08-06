@@ -2,6 +2,7 @@ package org.aeautomation.core;
 
 import org.aeautomation.utils.ConfigReader;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -121,5 +122,15 @@ public abstract class BasePage {
      */
     protected List<WebElement> waitForAllElements(By locator) {
         return wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
+    }
+
+    /**
+     * Clicks an element using JavaScript to bypass ad overlays or hidden elements.
+     *
+     * @param locator By locator of the element to click
+     */
+    protected void clickWithJS(By locator) {
+        WebElement element = waitForVisibility(locator);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
     }
 }
