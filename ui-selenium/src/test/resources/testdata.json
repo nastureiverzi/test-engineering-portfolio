@@ -19,5 +19,18 @@
     "city": "Los Angeles",
     "zipcode": "90210",
     "mobileNumber": "1234567890"
+  },
+  "invalidRegistration": {
+    "missingAtSymbol": {
+      "username": "testAccount",
+      "email": "test124.gmail.com"
+    },
+    "missingDomain": {
+      "username": "testAccount",
+      "email": "test124@gmail"
+    },
+    "emptyUsername": {
+      "email": "test124@gmail.com"
+    }
   }
 }

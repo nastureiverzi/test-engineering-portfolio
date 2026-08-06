@@ -1,9 +1,9 @@
 package org.aeautomation.tests;
 
 import org.aeautomation.core.BaseTest;
+import org.aeautomation.data.InvalidEmailData;
 import org.aeautomation.data.UserRegistrationData;
 import org.aeautomation.pages.*;
-import org.aeautomation.utils.ConfigReader;
 import org.aeautomation.utils.TestDataGenerator;
 import org.aeautomation.utils.TestDataManager;
 import org.testng.Assert;
@@ -115,5 +115,49 @@ public class RegisterUserTest extends BaseTest {
         // Expected Result 2: User remains on the signup/login page
         Assert.assertEquals(signupLoginPage.getSignupHeaderText(), SignupLoginPage.SIGNUP_HEADER_TEXT,
                 "User was not kept on the signup page after invalid registration attempt.");
+    }
+
+    /**
+     * TC-003 — Registration with missing @ symbol in email
+     * Pre-conditions:
+     * - User is not logged in
+     * - Email is not registered
+     * Test Data:
+     * - Username: testAccount
+     * - Email: test124.gmail.com
+     * Steps:
+     * 1. Navigate to homepage
+     * 2. Click "Signup / Login" in the top navigation menu
+     * 3. In the "New User Signup!" section, enter username and the malformed email
+     * 4. Click "Signup"
+     * Expected Result:
+     * - After step 4, browser displays a native HTML5 tooltip next to the email field indicating the @ symbol is missing
+     * - No network request is sent
+     * - User remains on the registration page
+     */
+    @Test(description = "TC-003: Registration with missing @ symbol in email triggers HTML5 native validation")
+    public void testRegistrationMissingAtSymbol() {
+        InvalidEmailData data = TestDataManager.getObject("invalidRegistration.missingAtSymbol", InvalidEmailData.class);
+
+        // Step 1: Navigate to home page
+        HomePage homePage = new HomePage();
+        homePage.open();
+
+        // Step 2: Click "Signup / Login" in the top navigation menu
+        SignupLoginPage signupLoginPage = homePage.clickSignupLogin();
+
+        // Steps 3 & 4: Enter username and malformed email, then click "Signup"
+        signupLoginPage.submitSignupExpectingFailure(data.username(), data.email());
+
+        // Expected Result 1: Browser displays a native HTML5 tooltip next to the email field indicating the @ symbol is missing
+        String validationMessage = signupLoginPage.getSignupEmailValidationMessage();
+        Assert.assertNotNull(validationMessage, "HTML5 validation message was null.");
+        Assert.assertFalse(validationMessage.isBlank(), "HTML5 validation message was empty.");
+        Assert.assertTrue(validationMessage.contains("@"),
+                "Validation message did not mention missing '@' symbol. Actual message: " + validationMessage);
+
+        // Expected Result 2: User remains on the registration page
+        Assert.assertEquals(signupLoginPage.getSignupHeaderText(), SignupLoginPage.SIGNUP_HEADER_TEXT,
+                "User was navigated away from signup page despite invalid email format.");
     }
 }

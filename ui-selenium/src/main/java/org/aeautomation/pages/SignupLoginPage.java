@@ -2,6 +2,8 @@ package org.aeautomation.pages;
 
 import org.aeautomation.core.BasePage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
 
 /**
  * Page Object representing the Signup / Login portal page (/login).
@@ -71,5 +73,16 @@ public class SignupLoginPage extends BasePage {
      */
     public String getSignupErrorMessage() {
         return getText(signupErrorMessage);
+    }
+
+    /**
+     * Retrieves the HTML5 native validation message from the signup email input field.
+     *
+     * @return The browser's native validation string
+     */
+    public String getSignupEmailValidationMessage() {
+        WebElement element = driver.findElement(signupEmailInput);
+        return (String) ((JavascriptExecutor) driver)
+                .executeScript("return arguments[0].validationMessage;", element);
     }
 }
