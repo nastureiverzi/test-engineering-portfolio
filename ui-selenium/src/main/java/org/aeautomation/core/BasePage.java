@@ -27,6 +27,15 @@ public abstract class BasePage {
     }
 
     /**
+     * Gets the current URL of the active browser tab.
+     *
+     * @return String representing the current URL
+     */
+    public String getCurrentUrl() {
+        return driver.getCurrentUrl();
+    }
+
+    /**
      * Navigates to a path relative to the configured Base URL.
      *
      * @param relativePath Page route (e.g. "/login")

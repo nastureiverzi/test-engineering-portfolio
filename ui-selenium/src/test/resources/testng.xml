@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="AE Automation Suite" verbose="1">
+
+    <groups>
+        <run>
+            <exclude name="known-bugs"/>
+        </run>
+    </groups>
+
+    <test name="Registration Tests">
+        <classes>
+            <class name="org.aeautomation.tests.RegisterUserTest"/>
+        </classes>
+    </test>
+
+</suite>

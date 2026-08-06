@@ -160,4 +160,42 @@ public class RegisterUserTest extends BaseTest {
         Assert.assertEquals(signupLoginPage.getSignupHeaderText(), SignupLoginPage.SIGNUP_HEADER_TEXT,
                 "User was navigated away from signup page despite invalid email format.");
     }
+
+    /**
+     * TC-004 — Registration with missing email domain
+     * Pre-conditions:
+     * - User is not logged in
+     * - Email is not registered
+     * Test Data:
+     * - Username: testAccount
+     * - Email: test124@gmail
+     * Steps:
+     * 1. Navigate to homepage
+     * 2. Click "Signup / Login" in the top navigation menu
+     * 3. In the "New User Signup!" section, enter username and the malformed email
+     * 4. Click "Signup"
+     * Expected Result:
+     * - After step 4, browser or application displays a validation message indicating the email is invalid
+     * - User remains on the registration page
+     * Notes: Backend accepts test124@gmail as a valid email — missing domain suffix validation at both client and server level
+     */
+    @Test(description = "TC-004: Registration with missing email domain — documents known validation bug",
+            groups = {"known-bugs"})
+    public void testRegistrationMissingEmailDomain() {
+        InvalidEmailData data = TestDataManager.getObject("invalidRegistration.missingDomain", InvalidEmailData.class);
+
+        // Step 1: Navigate to home page
+        HomePage homePage = new HomePage();
+        homePage.open();
+
+        // Step 2: Click "Signup / Login" in the top navigation menu
+        SignupLoginPage signupLoginPage = homePage.clickSignupLogin();
+
+        // Steps 3 & 4: Enter username and malformed email, then click "Signup"
+        signupLoginPage.submitSignupExpectingFailure(data.username(), data.email());
+
+        // Expected Result 2: Check URL first to ensure user remained on signup/login page
+        Assert.assertFalse(signupLoginPage.getCurrentUrl().endsWith("/signup"),
+                "BUG: User was navigated away to full registration form despite missing email domain suffix!");
+    }
 }
