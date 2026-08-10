@@ -26,7 +26,7 @@ public class HomePage extends BasePage {
      */
     public HomePage open() {
         navigateTo(PAGE_PATH);
-        dismissCookieConsentIfPresent();
+        handleCookieConsentIfPresent();
         return this;
     }
 
@@ -63,11 +63,20 @@ public class HomePage extends BasePage {
     }
 
     /**
-     * Safely checks if a cookie consent overlay is blocking the UI.
+     * Checks if the "Logged in as" element is displayed in the navigation header.
+     *
+     * @return true if user is logged in, false otherwise
      */
-    private void dismissCookieConsentIfPresent() {
-        if (!driver.findElements(consentButton).isEmpty()) {
-            click(consentButton);
-        }
+    public boolean isUserLoggedIn() {
+        return isDisplayed(loggedInAsText);
+    }
+
+    /**
+     * Retrieves the "Logged in as <username>" text from the navigation bar.
+     *
+     * @return String containing the logged-in user header text
+     */
+    public String getLoggedInUsername() {
+        return getText(loggedInAsText);
     }
 }

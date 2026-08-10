@@ -63,6 +63,7 @@ public class SignupLoginPage extends BasePage {
         type(signupNameInput, name);
         type(signupEmailInput, email);
         click(signupButton);
+        handleGoogleVignetteAd();
         return this;
     }
 
@@ -81,8 +82,47 @@ public class SignupLoginPage extends BasePage {
      * @return The browser's native validation string
      */
     public String getSignupEmailValidationMessage() {
-        WebElement element = driver.findElement(signupEmailInput);
+        WebElement element = waitForVisibility(signupEmailInput);
         return (String) ((JavascriptExecutor) driver)
                 .executeScript("return arguments[0].validationMessage;", element);
+    }
+
+    /**
+     * Retrieves the HTML5 native validation message from the signup username input field.
+     *
+     * @return The browser's native validation string (e.g., "Please fill out this field.")
+     */
+    public String getSignupUsernameValidationMessage() {
+        WebElement element = waitForVisibility(signupNameInput);
+        return (String) ((JavascriptExecutor) driver)
+                .executeScript("return arguments[0].validationMessage;", element);
+    }
+
+    /**
+     * Submits the signup form leaving the username field empty.
+     *
+     * @param email The email address to enter into the signup form
+     */
+    public void submitSignupWithEmptyUsername(String email) {
+        waitForVisibility(signupNameInput).clear();
+        type(signupEmailInput, email);
+        clickWithJS(signupButton);
+        handleGoogleVignetteAd();
+    }
+
+    /**
+     * Logs in with the provided email and password.
+     *
+     * @param email    User email address
+     * @param password User password
+     * @return HomePage instance after submitting credentials
+     */
+    public HomePage login(String email, String password) {
+        type(loginEmailInput, email);
+        type(loginPasswordInput, password);
+        clickWithJS(loginButton);
+        handleGoogleVignetteAd();
+
+        return new HomePage();
     }
 }

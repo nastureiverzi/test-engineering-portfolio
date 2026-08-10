@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 /**
  * Test Suite verifying the user account creation and registration workflows.
  */
-public class RegisterUserTest extends BaseTest {
+public class RegisterUserTests extends BaseTest {
     /**
      * TC-001: Register User successfully and verify authenticated redirection.
      * <p>
@@ -197,5 +197,46 @@ public class RegisterUserTest extends BaseTest {
         // Expected Result 2: Check URL first to ensure user remained on signup/login page
         Assert.assertFalse(signupLoginPage.getCurrentUrl().endsWith("/signup"),
                 "BUG: User was navigated away to full registration form despite missing email domain suffix!");
+    }
+
+    /**
+     * TC-005 — Registration with empty username field
+     * Pre-conditions:
+     * - User is not logged in
+     * - Email is not registered
+     * Test Data:
+     * - Username: (empty)
+     * - Email: test124@gmail.com
+     * Steps:
+     * 1. Navigate to homepage
+     * 2. Click "Signup / Login" in the top navigation menu
+     * 3. In the "New User Signup!" section, leave the username field empty and enter a valid email
+     * 4. Click "Signup"
+     * Expected Result:
+     * - After step 4, browser displays a tooltip next to the username field indicating the field is required
+     * - User remains on the registration page
+     */
+    @Test(description = "TC-005: Registration with empty username field triggers HTML5 required validation")
+    public void testRegistrationEmptyUsername() {
+        InvalidEmailData data = TestDataManager.getObject("invalidRegistration.emptyUsername", InvalidEmailData.class);
+
+        // Step 1: Navigate to home page
+        HomePage homePage = new HomePage();
+        homePage.open();
+
+        // Step 2: Click "Signup / Login" in the top navigation menu
+        SignupLoginPage signupLoginPage = homePage.clickSignupLogin();
+
+        // Steps 3 & 4: Leave username empty and enter valid email, then click "Signup"
+        signupLoginPage.submitSignupWithEmptyUsername(data.email());
+
+        // Expected Result 1: Browser displays a native HTML5 validation tooltip indicating field is required
+        String validationMessage = signupLoginPage.getSignupUsernameValidationMessage();
+        Assert.assertNotNull(validationMessage, "HTML5 validation message was null.");
+        Assert.assertFalse(validationMessage.isBlank(), "HTML5 validation message was empty.");
+
+        // Expected Result 2: User remains on the registration page (URL ends with /login)
+        Assert.assertEquals(signupLoginPage.getSignupHeaderText(), SignupLoginPage.SIGNUP_HEADER_TEXT,
+                "User was navigated away from signup page despite missing required username.");
     }
 }

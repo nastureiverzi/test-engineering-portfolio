@@ -9,27 +9,30 @@ import org.openqa.selenium.By;
  */
 public class AccountInformationPage extends BasePage {
 
-    // Locators
+    // Header & Section Identifiers
     private final By pageHeader = By.xpath("//b[contains(text(),'Enter Account Information')]");
-    private final By mrTitleRadio = By.id("id_gender1");
-    private final By passwordInput = By.id("password");
-    private final By daysDropdown = By.id("days");
-    private final By monthsDropdown = By.id("months");
-    private final By yearsDropdown = By.id("years");
-    private final By newsletterCheckbox = By.id("newsletter");
-    private final By offersCheckbox = By.id("optin");
 
-    // Address Locators
-    private final By firstNameInput = By.id("first_name");
-    private final By lastNameInput = By.id("last_name");
-    private final By companyInput = By.id("company");
-    private final By address1Input = By.id("address1");
-    private final By address2Input = By.id("address2");
-    private final By countryDropdown = By.id("country");
-    private final By stateInput = By.id("state");
-    private final By cityInput = By.id("city");
-    private final By zipcodeInput = By.id("zipcode");
-    private final By mobileNumberInput = By.id("mobile_number");
+    // Account Details Locators
+    private final By mrTitleRadio = By.xpath("//input[@type='radio' and (@id='id_gender1' or @value='Mr')]");
+    private final By mrsTitleRadio = By.xpath("//input[@type='radio' and (@id='id_gender2' or @value='Mrs')]");
+    private final By passwordInput = By.xpath("//input[@data-qa='password' or @name='password']");
+    private final By daysDropdown = By.xpath("//select[@data-qa='days' or @name='days']");
+    private final By monthsDropdown = By.xpath("//select[@data-qa='months' or @name='months']");
+    private final By yearsDropdown = By.xpath("//select[@data-qa='years' or @name='years']");
+    private final By newsletterCheckbox = By.xpath("//input[@name='newsletter']");
+    private final By offersCheckbox = By.xpath("//input[@name='optin']");
+
+    // Address Details Locators
+    private final By firstNameInput = By.xpath("//input[@data-qa='first_name' or @name='first_name']");
+    private final By lastNameInput = By.xpath("//input[@data-qa='last_name' or @name='last_name']");
+    private final By companyInput = By.xpath("//input[@data-qa='company' or @name='company']");
+    private final By address1Input = By.xpath("//input[@data-qa='address' or @name='address1']");
+    private final By address2Input = By.xpath("//input[@data-qa='address2' or @name='address2']");
+    private final By countryDropdown = By.xpath("//select[@data-qa='country' or @name='country']");
+    private final By stateInput = By.xpath("//input[@data-qa='state' or @name='state']");
+    private final By cityInput = By.xpath("//input[@data-qa='city' or @name='city']");
+    private final By zipcodeInput = By.xpath("//input[@data-qa='zipcode' or @name='zipcode']");
+    private final By mobileNumberInput = By.xpath("//input[@data-qa='mobile_number' or @name='mobile_number']");
     private final By createAccountButton = By.xpath("//button[@data-qa='create-account']");
 
     public static final String HEADER_TEXT = "ENTER ACCOUNT INFORMATION";
@@ -126,6 +129,7 @@ public class AccountInformationPage extends BasePage {
      */
     public AccountCreatedPage clickCreateAccount() {
         click(createAccountButton);
+        handleGoogleVignetteAd();
         return new AccountCreatedPage();
     }
 }

@@ -10,7 +10,13 @@
 
     <test name="Registration Tests">
         <classes>
-            <class name="org.aeautomation.tests.RegisterUserTest"/>
+            <class name="org.aeautomation.tests.RegisterUserTests"/>
+        </classes>
+    </test>
+
+    <test name="Authentication Tests">
+        <classes>
+            <class name="org.aeautomation.tests.AuthenticateUserTests"/>
         </classes>
     </test>
 
