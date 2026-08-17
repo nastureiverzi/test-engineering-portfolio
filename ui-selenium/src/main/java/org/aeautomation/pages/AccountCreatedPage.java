@@ -29,7 +29,7 @@ public class AccountCreatedPage extends BasePage {
      * @return New instance of HomePage representing the authenticated session home view
      */
     public HomePage clickContinue() {
-        clickWithJS(continueButton);
+        click(continueButton);
         handleGoogleVignetteAd();
 
         return new HomePage();

@@ -25,6 +25,7 @@ public class SignupLoginPage extends BasePage {
     private final By loginEmailInput = By.xpath("//input[@data-qa='login-email']");
     private final By loginPasswordInput = By.xpath("//input[@data-qa='login-password']");
     private final By loginButton = By.xpath("//button[@data-qa='login-button']");
+    private final By loginErrorMessage = By.xpath("//form[@action='/login']//p");
 
     public static final String SIGNUP_HEADER_TEXT = "New User Signup!";
     public static final String EXISTING_EMAIL_ERROR_TEXT = "Email Address already exist!";
@@ -49,6 +50,7 @@ public class SignupLoginPage extends BasePage {
         type(signupNameInput, name);
         type(signupEmailInput, email);
         click(signupButton);
+        handleGoogleVignetteAd();
         return new AccountInformationPage();
     }
 
@@ -68,6 +70,18 @@ public class SignupLoginPage extends BasePage {
     }
 
     /**
+     * Submits the signup form leaving the username field empty.
+     *
+     * @param email The email address to enter into the signup form
+     */
+    public void submitSignupWithEmptyUsername(String email) {
+        clear(signupNameInput);
+        type(signupEmailInput, email);
+        click(signupButton);
+        handleGoogleVignetteAd();
+    }
+
+    /**
      * Retrieves the red validation error message text displayed below the signup form.
      *
      * @return Trimmed error message text (e.g., "Email Address already exist!")
@@ -82,9 +96,7 @@ public class SignupLoginPage extends BasePage {
      * @return The browser's native validation string
      */
     public String getSignupEmailValidationMessage() {
-        WebElement element = waitForVisibility(signupEmailInput);
-        return (String) ((JavascriptExecutor) driver)
-                .executeScript("return arguments[0].validationMessage;", element);
+        return getValidationMessage(signupEmailInput);
     }
 
     /**
@@ -93,21 +105,7 @@ public class SignupLoginPage extends BasePage {
      * @return The browser's native validation string (e.g., "Please fill out this field.")
      */
     public String getSignupUsernameValidationMessage() {
-        WebElement element = waitForVisibility(signupNameInput);
-        return (String) ((JavascriptExecutor) driver)
-                .executeScript("return arguments[0].validationMessage;", element);
-    }
-
-    /**
-     * Submits the signup form leaving the username field empty.
-     *
-     * @param email The email address to enter into the signup form
-     */
-    public void submitSignupWithEmptyUsername(String email) {
-        waitForVisibility(signupNameInput).clear();
-        type(signupEmailInput, email);
-        clickWithJS(signupButton);
-        handleGoogleVignetteAd();
+        return getValidationMessage(signupNameInput);
     }
 
     /**
@@ -120,9 +118,26 @@ public class SignupLoginPage extends BasePage {
     public HomePage login(String email, String password) {
         type(loginEmailInput, email);
         type(loginPasswordInput, password);
-        clickWithJS(loginButton);
+        click(loginButton);
         handleGoogleVignetteAd();
-
         return new HomePage();
+    }
+
+    /**
+     * Checks if the login error message is displayed.
+     *
+     * @return true if error message is visible, false otherwise
+     */
+    public boolean isLoginErrorMessageDisplayed() {
+        return isDisplayed(loginErrorMessage);
+    }
+
+    /**
+     * Retrieves the text of the login error message.
+     *
+     * @return String containing the error text
+     */
+    public String getLoginErrorMessageText() {
+        return getText(loginErrorMessage);
     }
 }

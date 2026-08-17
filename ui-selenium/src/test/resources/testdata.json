@@ -41,6 +41,15 @@
       "email": "testuser123.qa@gmail.com",
       "password": "testPass",
       "expectedUsername": "testAccount"
+    },
+    "invalidPassword": {
+      "email": "testuser123.qa@gmail.com",
+      "password": "testfail",
+      "expectedError": "Your email or password is incorrect."
+    },
+    "unregisteredEmail": {
+      "email": "testUnregisteredUser@gmail.com",
+      "password": "testPass"
     }
   }
 }

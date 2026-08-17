@@ -10,5 +10,6 @@ package org.aeautomation.data;
 public record LoginData(
         String email,
         String password,
-        String expectedUsername
+        String expectedUsername,
+        String expectedError
 ) {}

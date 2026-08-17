@@ -45,13 +45,29 @@ public abstract class BasePage {
     }
 
     /**
-     * Waits for an element to be visible before clicking it.
+     * Clears an input field safely, falling back to JavaScript if standard clear fails.
+     *
+     * @param locator By locator strategy
+     */
+    protected void clear(By locator) {
+        WebElement element = waitForVisibility(locator);
+        scrollIntoView(element);
+        try {
+            element.clear();
+        } catch (ElementNotInteractableException e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].value = '';", element);
+        }
+    }
+
+    /**
+     * Clicks an element after ensuring it is clickable and scrolled into view.
+     * Falls back to JavaScript click if intercepted by overlays or ad banners.
      *
      * @param locator By locator strategy
      */
     protected void click(By locator) {
         WebElement element = waitForClickability(locator);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
+        scrollIntoView(element);
         try {
             element.click();
         } catch (ElementNotInteractableException e) {
@@ -87,15 +103,16 @@ public abstract class BasePage {
     }
 
     /**
-     * Checks if an element is displayed on the page.
+     * Checks if an element is currently displayed on the page.
+     * Returns false gracefully if the element is not found within the timeout period.
      *
      * @param locator By locator strategy
-     * @return True if visible, false if absent or hidden
+     * @return true if visible, false otherwise
      */
     protected boolean isDisplayed(By locator) {
         try {
             return waitForVisibility(locator).isDisplayed();
-        } catch (Exception e) {
+        } catch (TimeoutException | NoSuchElementException e) {
             return false;
         }
     }
@@ -133,6 +150,18 @@ public abstract class BasePage {
     }
 
     /**
+     * Retrieves the HTML5 native browser validation message (e.g., "Please fill out this field.").
+     *
+     * @param locator By locator strategy
+     * @return HTML5 validation message string
+     */
+    protected String getValidationMessage(By locator) {
+        WebElement element = waitForVisibility(locator);
+        return (String) ((JavascriptExecutor) driver)
+                .executeScript("return arguments[0].validationMessage;", element);
+    }
+
+    /**
      * Waits until all elements matching the locator are visible.
      *
      * @param locator By locator strategy
@@ -140,16 +169,6 @@ public abstract class BasePage {
      */
     protected List<WebElement> waitForAllElements(By locator) {
         return wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
-    }
-
-    /**
-     * Clicks an element using JavaScript to bypass ad overlays or hidden elements.
-     *
-     * @param locator By locator of the element to click
-     */
-    protected void clickWithJS(By locator) {
-        WebElement element = waitForVisibility(locator);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
     }
 
     /**
@@ -177,5 +196,14 @@ public abstract class BasePage {
                 ((JavascriptExecutor) driver).executeScript("arguments[0].click();", elements.get(0));
             }
         }
+    }
+
+    /**
+     * Smoothly scrolls the viewport to align the targeted element in the center of the screen.
+     *
+     * @param element The target WebElement
+     */
+    private void scrollIntoView(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
     }
 }
