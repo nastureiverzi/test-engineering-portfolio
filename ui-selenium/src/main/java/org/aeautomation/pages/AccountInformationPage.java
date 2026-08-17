@@ -1,6 +1,7 @@
 package org.aeautomation.pages;
 
 import org.aeautomation.core.BasePage;
+import org.aeautomation.data.Title;
 import org.aeautomation.data.UserRegistrationData;
 import org.openqa.selenium.By;
 
@@ -8,7 +9,6 @@ import org.openqa.selenium.By;
  * Page Object representing the Account Information form page (/signup).
  */
 public class AccountInformationPage extends BasePage {
-
     // Header & Section Identifiers
     private final By pageHeader = By.xpath("//b[contains(text(),'Enter Account Information')]");
 
@@ -47,15 +47,19 @@ public class AccountInformationPage extends BasePage {
     }
 
     /**
-     * Selects the "Mr." title radio button.
+     * Selects the title radio button dynamically based on the Title enum provided.
      *
+     * @param title Title enum (MR or MRS)
      * @return Current AccountInformationPage instance for method chaining
      */
-    public AccountInformationPage selectTitleMr() {
-        click(mrTitleRadio);
+    public AccountInformationPage selectTitle(Title title) {
+        log.info("Selecting title: {}", title);
+        switch (title) {
+            case MR -> click(mrTitleRadio);
+            case MRS -> click(mrsTitleRadio);
+        }
         return this;
     }
-
     /**
      * Enters the password for the new account.
      *
@@ -96,16 +100,7 @@ public class AccountInformationPage extends BasePage {
     /**
      * Fills in all required and optional address details in the registration form.
      *
-     * @param firstName    First name
-     * @param lastName     Last name
-     * @param company      Company name
-     * @param address1     Primary address line
-     * @param address2     Secondary address line
-     * @param country      Country visible text (e.g., "United States")
-     * @param state        State name
-     * @param city         City name
-     * @param zipcode      Zip/Postal code
-     * @param mobile       Mobile phone number
+     * @param data Record containing user profile and address details
      * @return Current AccountInformationPage instance for method chaining
      */
     public AccountInformationPage fillAddressDetails(UserRegistrationData data) {

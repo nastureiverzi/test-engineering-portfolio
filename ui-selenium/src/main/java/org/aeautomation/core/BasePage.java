@@ -1,6 +1,8 @@
 package org.aeautomation.core;
 
 import org.aeautomation.utils.ConfigReader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -18,6 +20,7 @@ public abstract class BasePage {
 
     protected WebDriver driver;
     protected WebDriverWait wait;
+    protected static final Logger log = LogManager.getLogger(BasePage.class);
 
     public BasePage() {
         this.driver = DriverFactory.getDriver();
@@ -30,7 +33,9 @@ public abstract class BasePage {
      * @return String representing the current URL
      */
     public String getCurrentUrl() {
-        return driver.getCurrentUrl();
+        String url = driver.getCurrentUrl();
+        log.debug("Fetched current URL: {}", url);
+        return url;
     }
 
     /**
@@ -41,7 +46,9 @@ public abstract class BasePage {
     protected void navigateTo(String relativePath) {
         String baseUrl = ConfigReader.getBaseUrl();
         String formattedPath = relativePath.startsWith("/") ? relativePath : "/" + relativePath;
-        driver.get(baseUrl + formattedPath);
+        String fullUrl = baseUrl + formattedPath;
+        log.debug("Navigating to relative path: {} (Full URL: {})", relativePath, fullUrl);
+        driver.get(fullUrl);
     }
 
     /**
@@ -54,7 +61,9 @@ public abstract class BasePage {
         scrollIntoView(element);
         try {
             element.clear();
+            log.debug("Cleared input field located by [{}]", locator);
         } catch (ElementNotInteractableException e) {
+            log.warn("Standard clear failed for [{}], executing JavaScript fallback", locator);
             ((JavascriptExecutor) driver).executeScript("arguments[0].value = '';", element);
         }
     }
@@ -70,7 +79,9 @@ public abstract class BasePage {
         scrollIntoView(element);
         try {
             element.click();
+            log.debug("Clicked element located by [{}]", locator);
         } catch (ElementNotInteractableException e) {
+            log.warn("Standard click failed for [{}], executing JavaScript fallback", locator);
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
         }
     }
@@ -83,11 +94,13 @@ public abstract class BasePage {
      */
     protected void type(By locator, String text) {
         WebElement element = waitForVisibility(locator);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
+        scrollIntoView(element);
         try {
             element.clear();
             element.sendKeys(text);
+            log.debug("Typed '{}' into field located by [{}]", text, locator);
         } catch (ElementNotInteractableException e) {
+            log.warn("Standard type failed for [{}], executing JavaScript fallback", locator);
             ((JavascriptExecutor) driver).executeScript("arguments[0].value = arguments[1];", element, text);
         }
     }
@@ -99,7 +112,9 @@ public abstract class BasePage {
      * @return Visible text string
      */
     protected String getText(By locator) {
-        return waitForVisibility(locator).getText().trim();
+        String text = waitForVisibility(locator).getText().trim();
+        log.debug("Retrieved text '{}' from element located by [{}]", text, locator);
+        return text;
     }
 
     /**
@@ -111,8 +126,11 @@ public abstract class BasePage {
      */
     protected boolean isDisplayed(By locator) {
         try {
-            return waitForVisibility(locator).isDisplayed();
+            boolean visible = waitForVisibility(locator).isDisplayed();
+            log.debug("Visibility check for [{}] returned: {}", locator, visible);
+            return visible;
         } catch (TimeoutException | NoSuchElementException e) {
+            log.debug("Element located by [{}] was not displayed within timeout", locator);
             return false;
         }
     }
@@ -127,6 +145,7 @@ public abstract class BasePage {
         WebElement element = waitForVisibility(locator);
         Select select = new Select(element);
         select.selectByVisibleText(visibleText);
+        log.debug("Selected option '{}' from dropdown located by [{}]", visibleText, locator);
     }
 
     /**
@@ -157,8 +176,10 @@ public abstract class BasePage {
      */
     protected String getValidationMessage(By locator) {
         WebElement element = waitForVisibility(locator);
-        return (String) ((JavascriptExecutor) driver)
+        String message = (String) ((JavascriptExecutor) driver)
                 .executeScript("return arguments[0].validationMessage;", element);
+        log.debug("Retrieved HTML5 validation message '{}' from [{}]", message, locator);
+        return message;
     }
 
     /**
@@ -178,7 +199,10 @@ public abstract class BasePage {
     protected void handleGoogleVignetteAd() {
         Optional.ofNullable(driver.getCurrentUrl())
                 .filter(url -> url.contains("#google_vignette"))
-                .ifPresent(url -> driver.navigate().to(ConfigReader.getBaseUrl()));
+                .ifPresent(url -> {
+                    log.warn("Google Vignette ad overlay detected. Redirecting back to Base URL.");
+                    driver.navigate().to(ConfigReader.getBaseUrl());
+                });
     }
 
     /**
@@ -190,9 +214,11 @@ public abstract class BasePage {
 
         List<WebElement> elements = driver.findElements(consentButton);
         if (!elements.isEmpty() && elements.get(0).isDisplayed()) {
+            log.debug("Cookie consent popup detected. Attempting to accept.");
             try {
                 elements.get(0).click();
             } catch (Exception e) {
+                log.warn("Standard click failed on cookie consent button, attempting JS click fallback");
                 ((JavascriptExecutor) driver).executeScript("arguments[0].click();", elements.get(0));
             }
         }

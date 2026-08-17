@@ -5,6 +5,8 @@ import org.aeautomation.data.LoginData;
 import org.aeautomation.pages.HomePage;
 import org.aeautomation.pages.SignupLoginPage;
 import org.aeautomation.utils.TestDataManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -13,6 +15,8 @@ import org.testng.annotations.Test;
  * and invalid credentials.
  */
 public class AuthenticateUserTests extends BaseTest {
+
+    private static final Logger log = LogManager.getLogger(AuthenticateUserTests.class);
 
     /**
      * TC-006 — Successful login with valid credentials
@@ -35,7 +39,7 @@ public class AuthenticateUserTests extends BaseTest {
     @Test(description = "TC-006: Successful login with valid credentials")
     public void testSuccessfulLogin() {
         LoginData data = TestDataManager.getObject("authentication.validUser", LoginData.class);
-
+        log.info("TC-006: Verifying login for user: [{}]", data.expectedUsername());
         // Step 1: Navigate to home page
         HomePage homePage = new HomePage();
         homePage.open();
@@ -93,7 +97,7 @@ public class AuthenticateUserTests extends BaseTest {
         SignupLoginPage signupLoginPage = homePage.clickSignupLogin();
 
         // Steps 3 & 4: Enter valid email and incorrect password, then click "Login"
-        signupLoginPage.login(data.email(), data.password());
+        signupLoginPage.loginExpectingFailure(data.email(), data.password());
 
         // Expected Result 1: Red error message displayed below form
         Assert.assertTrue(
@@ -102,7 +106,7 @@ public class AuthenticateUserTests extends BaseTest {
         );
         Assert.assertEquals(
                 signupLoginPage.getLoginErrorMessageText(),
-                "Your email or password is incorrect!",
+                data.expectedError(),  // use record field, not constant
                 "Login error message text did not match expected value."
         );
 
@@ -145,12 +149,12 @@ public class AuthenticateUserTests extends BaseTest {
         SignupLoginPage signupLoginPage = homePage.clickSignupLogin();
 
         // Steps 3 & 4: Enter unregistered email and password, then click "Login"
-        signupLoginPage.login(data.email(), data.password());
+        signupLoginPage.loginExpectingFailure(data.email(), data.password());
 
         // Expected Result 1: Red error message displayed below form indicating email/password is incorrect
         Assert.assertTrue(signupLoginPage.isLoginErrorMessageDisplayed(),
                 "Login error message was not displayed.");
-        Assert.assertEquals(signupLoginPage.getLoginErrorMessageText(), "Your email or password is incorrect!",
+        Assert.assertEquals(signupLoginPage.getLoginErrorMessageText(), data.expectedError(),
                 "Login error message text did not match expected value.");
 
         // Expected Result 2: User remains on the login page

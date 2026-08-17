@@ -1,6 +1,8 @@
 package org.aeautomation.core;
 
 import org.aeautomation.utils.ConfigReader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -8,9 +10,10 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -20,6 +23,7 @@ import java.util.function.Supplier;
  */
 public final class DriverFactory {
 
+    private static final Logger log = LogManager.getLogger(DriverFactory.class);
     private static final ThreadLocal<WebDriver> driverPool = new ThreadLocal<>();
 
     // --- Browser Engine Option Constants ---
@@ -50,7 +54,11 @@ public final class DriverFactory {
      */
     public static void initDriver(BrowserType browserType) {
         if (driverPool.get() == null) {
+            log.info("Initializing [{}] browser instance for thread ID [{}] (Headless: {})",
+                    browserType, Thread.currentThread().getId(), ConfigReader.isHeadless());
             driverPool.set(browserType.createDriver());
+        } else {
+            log.warn("WebDriver instance already exists for thread ID [{}]", Thread.currentThread().getId());
         }
     }
 
@@ -59,6 +67,8 @@ public final class DriverFactory {
      */
     public static WebDriver getDriver() {
         if (driverPool.get() == null) {
+            log.error("Attempted to fetch WebDriver, but instance was not initialized for thread ID [{}]",
+                    Thread.currentThread().getId());
             throw new IllegalStateException("Driver has not been initialized. Call initDriver() first.");
         }
         return driverPool.get();
@@ -69,8 +79,12 @@ public final class DriverFactory {
      */
     public static void quitDriver() {
         if (driverPool.get() != null) {
+            log.info("Quitting WebDriver instance and removing from ThreadLocal pool for thread ID [{}]",
+                    Thread.currentThread().getId());
             driverPool.get().quit();
             driverPool.remove();
+        } else {
+            log.debug("No active WebDriver instance to tear down for thread ID [{}]", Thread.currentThread().getId());
         }
     }
 
@@ -78,19 +92,25 @@ public final class DriverFactory {
 
     private static WebDriver createChromeDriver() {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments(getChromiumOptions());
+        List<String> args = getChromiumOptions();
+        options.addArguments(args);
+        log.debug("Launching Chrome with arguments: {}", args);
         return new ChromeDriver(options);
     }
 
     private static WebDriver createFirefoxDriver() {
         FirefoxOptions options = new FirefoxOptions();
-        options.addArguments(getFirefoxOptions());
+        List<String> args = getFirefoxOptions();
+        options.addArguments(args);
+        log.debug("Launching Firefox with arguments: {}", args);
         return new FirefoxDriver(options);
     }
 
     private static WebDriver createEdgeDriver() {
         EdgeOptions options = new EdgeOptions();
-        options.addArguments(getChromiumOptions());
+        List<String> args = getChromiumOptions();
+        options.addArguments(args);
+        log.debug("Launching Edge with arguments: {}", args);
         return new EdgeDriver(options);
     }
 
@@ -132,13 +152,13 @@ public final class DriverFactory {
      * @return List of additional browser flag strings
      */
     private static List<String> getCustomBrowserArgs() {
-        return java.util.Optional.of(ConfigReader.getProperty("browser.args", ""))
-                .filter(java.util.function.Predicate.not(String::isBlank))
-                .map(args -> java.util.regex.Pattern.compile(";")
+        return Optional.of(ConfigReader.getProperty("browser.args", ""))
+                .filter(Predicate.not(String::isBlank))
+                .map(args -> Pattern.compile(";")
                         .splitAsStream(args)
                         .map(String::trim)
-                        .filter(java.util.function.Predicate.not(String::isBlank))
-                        .toList()) // Unmodifiable List (Java 16+)
+                        .filter(Predicate.not(String::isBlank))
+                        .toList())
                 .orElseGet(List::of);
     }
 }

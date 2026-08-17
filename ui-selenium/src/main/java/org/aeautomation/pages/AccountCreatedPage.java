@@ -8,7 +8,6 @@ import org.openqa.selenium.By;
  * Handles header verification and navigation back to the home page.
  */
 public class AccountCreatedPage extends BasePage {
-
     private final By accountCreatedHeader = By.xpath("//b[contains(text(),'Account Created!')]");
     private final By continueButton = By.xpath("//a[@data-qa='continue-button']");
 

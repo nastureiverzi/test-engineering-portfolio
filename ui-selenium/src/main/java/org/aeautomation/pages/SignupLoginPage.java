@@ -2,8 +2,6 @@ package org.aeautomation.pages;
 
 import org.aeautomation.core.BasePage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebElement;
 
 /**
  * Page Object representing the Signup / Login portal page (/login).
@@ -19,7 +17,7 @@ public class SignupLoginPage extends BasePage {
     private final By signupNameInput = By.xpath("//input[@data-qa='signup-name']");
     private final By signupEmailInput = By.xpath("//input[@data-qa='signup-email']");
     private final By signupButton = By.xpath("//button[@data-qa='signup-button']");
-    private final By signupErrorMessage = By.xpath("//div[@class='signup-form']//p");
+    private final By signupErrorMessage = By.xpath("//p[contains(@style,'color: red')]");
 
     // Existing User Login locators
     private final By loginEmailInput = By.xpath("//input[@data-qa='login-email']");
@@ -29,6 +27,7 @@ public class SignupLoginPage extends BasePage {
 
     public static final String SIGNUP_HEADER_TEXT = "New User Signup!";
     public static final String EXISTING_EMAIL_ERROR_TEXT = "Email Address already exist!";
+    public static final String INVALID_CREDENTIALS_ERROR_TEXT = "Your email or password is incorrect!";
 
     /**
      * Retrieves the text header from the "New User Signup!" section.
@@ -59,14 +58,12 @@ public class SignupLoginPage extends BasePage {
      *
      * @param name  Full name of the user
      * @param email Already registered email address
-     * @return Current SignupLoginPage instance for asserting validation messages
      */
-    public SignupLoginPage submitSignupExpectingFailure(String name, String email) {
+    public void submitSignupExpectingFailure(String name, String email) {
         type(signupNameInput, name);
         type(signupEmailInput, email);
         click(signupButton);
         handleGoogleVignetteAd();
-        return this;
     }
 
     /**
@@ -121,6 +118,18 @@ public class SignupLoginPage extends BasePage {
         click(loginButton);
         handleGoogleVignetteAd();
         return new HomePage();
+    }
+
+    /**
+     * Enters the email and password into the login form and submits it when expecting a authentication failure.
+     *
+     * @param email    User email address
+     * @param password User password
+     */
+    public void loginExpectingFailure(String email, String password) {
+        type(loginEmailInput, email);
+        type(loginPasswordInput, password);
+        click(loginButton);
     }
 
     /**

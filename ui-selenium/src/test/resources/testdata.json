@@ -45,11 +45,12 @@
     "invalidPassword": {
       "email": "testuser123.qa@gmail.com",
       "password": "testfail",
-      "expectedError": "Your email or password is incorrect."
+      "expectedError": "Your email or password is incorrect!"
     },
     "unregisteredEmail": {
       "email": "testUnregisteredUser@gmail.com",
-      "password": "testPass"
+      "password": "testPass",
+      "expectedError": "Your email or password is incorrect!"
     }
   }
 }

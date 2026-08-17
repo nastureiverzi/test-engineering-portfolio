@@ -16,9 +16,6 @@ public class HomePage extends BasePage {
     private final By signupLoginLink = By.xpath("//a[contains(text(),'Signup / Login')]");
     private final By loggedInAsText = By.xpath("//li[contains(.,'Logged in as')]");
 
-    // Cookie / GDPR Banner consent button
-    private final By consentButton = By.xpath("//button[contains(@class,'fc-cta-consent') or contains(.,'Consent') or contains(.,'AGREE') or contains(.,'Accept')]");
-
     /**
      * Navigates to the home page URL and automatically checks for GDPR cookie popups.
      *

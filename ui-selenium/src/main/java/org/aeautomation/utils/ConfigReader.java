@@ -1,5 +1,8 @@
 package org.aeautomation.utils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
@@ -13,6 +16,7 @@ import java.util.stream.Stream;
  */
 public final class ConfigReader {
 
+    private static final Logger log = LogManager.getLogger(ConfigReader.class);
     private static final Properties properties = new Properties();
     private static final String CONFIG_FILE_PATH = "config.properties";
 
@@ -22,11 +26,14 @@ public final class ConfigReader {
                 .getResourceAsStream(CONFIG_FILE_PATH)) {
 
             if (input == null) {
+                log.error("Configuration file '{}' not found in classpath.", CONFIG_FILE_PATH);
                 throw new IllegalStateException("Configuration file '" + CONFIG_FILE_PATH + "' not found in classpath.");
             }
             properties.load(input);
+            log.info("Successfully loaded configuration properties from [{}]", CONFIG_FILE_PATH);
 
         } catch (IOException e) {
+            log.error("Failed to load configuration file: {}", CONFIG_FILE_PATH, e);
             throw new RuntimeException("Failed to load configuration file: " + CONFIG_FILE_PATH, e);
         }
     }
@@ -42,7 +49,7 @@ public final class ConfigReader {
      * @throws IllegalArgumentException if the property key is missing across all configuration sources
      */
     public static String getProperty(String key, String... optionalValues) {
-        return Stream.concat(
+        String resolvedValue = Stream.concat(
                         Stream.of(System.getProperty(key), properties.getProperty(key)),
                         Stream.of(optionalValues)
                 )
@@ -50,8 +57,14 @@ public final class ConfigReader {
                 .map(String::trim)
                 .filter(val -> !val.isEmpty())
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Property key '" + key + "' was not found in System properties, config.properties, or optional parameters!"));
+                .orElseThrow(() -> {
+                    log.error("Property key '{}' was not found across System properties, config.properties, or optional defaults!", key);
+                    return new IllegalArgumentException(
+                            "Property key '" + key + "' was not found in System properties, config.properties, or optional parameters!");
+                });
+
+        log.debug("Resolved configuration property [{}] -> '{}'", key, resolvedValue);
+        return resolvedValue;
     }
 
     /**
@@ -63,7 +76,7 @@ public final class ConfigReader {
         try {
             return Integer.parseInt(getProperty("timeout"));
         } catch (NumberFormatException e) {
-            System.err.println("Invalid 'timeout' value in configuration. Defaulting to 10 seconds.");
+            log.warn("Invalid or missing 'timeout' property in configuration. Defaulting to 10 seconds.");
             return 10;
         }
     }
