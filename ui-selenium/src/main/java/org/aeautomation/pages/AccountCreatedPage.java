@@ -5,7 +5,6 @@ import org.openqa.selenium.By;
 
 /**
  * Page Object representing the "ACCOUNT CREATED!" confirmation screen.
- * Handles header verification and navigation back to the home page.
  */
 public class AccountCreatedPage extends BasePage {
     private final By accountCreatedHeader = By.xpath("//b[contains(text(),'Account Created!')]");

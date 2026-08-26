@@ -60,5 +60,8 @@
       "email": "testuser123.qa@gmail.com",
       "password": ""
     }
+  },
+  "productSearch": {
+    "keyword": "top"
   }
 }

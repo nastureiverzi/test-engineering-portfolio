@@ -5,7 +5,6 @@ import org.openqa.selenium.By;
 
 /**
  * Page Object representing the Signup / Login portal page (/login).
- * Handles authentication inputs for both existing users (login) and new users (signup).
  */
 public class SignupLoginPage extends BasePage {
 

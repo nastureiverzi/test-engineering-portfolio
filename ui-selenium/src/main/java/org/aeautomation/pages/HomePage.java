@@ -2,11 +2,13 @@ package org.aeautomation.pages;
 
 import org.aeautomation.core.BasePage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+
 import java.util.Optional;
 
 /**
  * Page Object representing the main application landing page.
- * Provides interactions for top navigation menu items and initial page assertions.
  */
 public class HomePage extends BasePage {
 
@@ -22,18 +24,19 @@ public class HomePage extends BasePage {
                     "| //*[contains(text(),'Server Error')]" +
                     "| //*[contains(text(),'UNIQUE constraint failed')]"
     );
-
-
+    private final String productNameTemplate = "(//div[contains(@class,'productinfo')]//p)[%d]";
+    private final String addToCartBtnTemplate = "(//div[contains(@class,'productinfo')]//a[contains(@class,'add-to-cart')])[%d]";
+    private final By modalTitle = By.xpath("//div[@id='cartModal']//h4[contains(@class,'modal-title') and contains(text(),'Added!')]");
+    private final By modalMessage = By.xpath("//div[@id='cartModal']//div[contains(@class,'modal-body')]//p[contains(text(),'Your product has been added to cart')]");
+    private final By modalContinueShoppingBtn = By.xpath("//div[@id='cartModal']//button[contains(text(),'Continue Shopping')]");
+    private final By modalViewCartLink = By.xpath("//div[@id='cartModal']//a[contains(@href,'/view_cart')]");
 
     /**
      * Navigates to the home page URL and automatically checks for GDPR cookie popups.
-     *
-     * @return Current HomePage instance for method chaining
      */
-    public HomePage open() {
+    public void open() {
         navigateTo(PAGE_PATH);
         handleCookieConsentIfPresent();
-        return this;
     }
 
     /**
@@ -98,5 +101,86 @@ public class HomePage extends BasePage {
                 .isPresent();
 
         return titleContainsError || isDisplayed(serverErrorIndicator);
+    }
+
+    /**
+     * Navigates to the Products page via top menu.
+     *
+     * @return ProductsPage instance
+     */
+    public ProductsPage clickProducts() {
+        click(By.cssSelector("a[href='/products']"));
+        return new ProductsPage();
+    }
+
+    /**
+     * Retrieves the title of any product by its 1-based index on the home page.
+     *
+     * @param productIndex 1-based index (1 = first product, 2 = second product, etc.)
+     * @return Product title string
+     */
+    public String getProductNameByIndex(int productIndex) {
+        By locator = By.xpath(String.format(productNameTemplate, productIndex));
+        return getText(locator);
+    }
+
+    /**
+     * Clicks "Add to cart" for any product card by its 1-based index.
+     *
+     * @param productIndex 1-based index
+     */
+    public void addProductToCartByIndex(int productIndex) {
+        By locator = By.xpath(String.format(addToCartBtnTemplate, productIndex));
+        WebElement element = waitForVisibility(locator);
+        new Actions(driver)
+                .moveToElement(element)
+                .perform();
+        click(locator);
+    }
+
+    /**
+     * Checks if the "Added!" popup modal title is displayed.
+     *
+     * @return true if visible
+     */
+    public boolean isAddToCartModalTitleDisplayed() {
+        return isDisplayed(modalTitle);
+    }
+
+    /**
+     * Checks if the "Your product has been added to cart" message is displayed in modal.
+     *
+     * @return true if visible
+     */
+    public boolean isAddToCartModalMessageDisplayed() {
+        return isDisplayed(modalMessage);
+    }
+
+    /**
+     * Checks if the "Continue Shopping" button is displayed in modal.
+     *
+     * @return true if visible
+     */
+    public boolean isContinueShoppingButtonDisplayed() {
+        return isDisplayed(modalContinueShoppingBtn);
+    }
+
+    /**
+     * Checks if the "View Cart" link is displayed in modal.
+     *
+     * @return true if visible
+     */
+    public boolean isModalViewCartLinkDisplayed() {
+        return isDisplayed(modalViewCartLink);
+    }
+
+    /**
+     * Clicks "View Cart" inside the modal to navigate to the Cart page.
+     *
+     * @return CartPage instance
+     */
+    public CartPage clickModalViewCart() {
+        click(modalViewCartLink);
+        return new CartPage();
     }
 }

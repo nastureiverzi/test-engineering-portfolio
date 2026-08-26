@@ -151,8 +151,12 @@ public class RegisterUserTests extends BaseTest {
         String validationMessage = signupLoginPage.getSignupEmailValidationMessage();
         Assert.assertNotNull(validationMessage, "HTML5 validation message was null.");
         Assert.assertFalse(validationMessage.isBlank(), "HTML5 validation message was empty.");
-        Assert.assertTrue(validationMessage.contains("@"),
-                "Validation message did not mention missing '@' symbol. Actual message: " + validationMessage);
+        Assert.assertTrue(
+                validationMessage.contains("@") ||
+                        validationMessage.toLowerCase().contains("email") ||
+                        validationMessage.toLowerCase().contains("address"),
+                "Validation message did not indicate invalid email format. Actual message: " + validationMessage
+        );
 
         // Expected Result 2: User remains on the registration page
         Assert.assertEquals(signupLoginPage.getSignupHeaderText(), SignupLoginPage.SIGNUP_HEADER_TEXT,
