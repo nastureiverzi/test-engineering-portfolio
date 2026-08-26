@@ -149,4 +149,22 @@ public class SignupLoginPage extends BasePage {
     public String getLoginErrorMessageText() {
         return getText(loginErrorMessage);
     }
+
+    /**
+     * Retrieves the HTML5 native validation message (tooltip) for the login email field.
+     *
+     * @return HTML5 validation message string (e.g., "Please fill out this field.")
+     */
+    public String getLoginEmailValidationMessage() {
+        return getValidationMessage(loginEmailInput); // Calls your BasePage method
+    }
+
+    /**
+     * Retrieves the HTML5 native validation message (tooltip) for the login password field.
+     *
+     * @return HTML5 validation message string (e.g., "Please fill out this field.")
+     */
+    public String getLoginPasswordValidationMessage() {
+        return getValidationMessage(loginPasswordInput);
+    }
 }

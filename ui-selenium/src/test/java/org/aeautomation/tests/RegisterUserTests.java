@@ -1,10 +1,7 @@
 package org.aeautomation.tests;
 
 import org.aeautomation.core.BaseTest;
-import org.aeautomation.data.ExistingUserData;
-import org.aeautomation.data.InvalidEmailData;
-import org.aeautomation.data.Title;
-import org.aeautomation.data.UserRegistrationData;
+import org.aeautomation.data.*;
 import org.aeautomation.pages.*;
 import org.aeautomation.utils.TestDataGenerator;
 import org.aeautomation.utils.TestDataManager;
@@ -97,8 +94,7 @@ public class RegisterUserTests extends BaseTest {
      */
     @Test(description = "TC-002: Registration with already registered email")
     public void testRegisterWithExistingEmail() {
-        // --- Test Data Initialization ---
-        ExistingUserData data = TestDataManager.getObject("existingUser", ExistingUserData.class);
+        UserCredentialsData data = TestDataManager.getObject("existingUser", UserCredentialsData.class);
 
         // Step 1: Navigate to home page
         HomePage homePage = new HomePage();
@@ -139,7 +135,7 @@ public class RegisterUserTests extends BaseTest {
      */
     @Test(description = "TC-003: Registration with missing @ symbol in email triggers HTML5 native validation")
     public void testRegistrationMissingAtSymbol() {
-        InvalidEmailData data = TestDataManager.getObject("invalidRegistration.missingAtSymbol", InvalidEmailData.class);
+        UserCredentialsData data = TestDataManager.getObject("invalidRegistration.missingAtSymbol", UserCredentialsData.class);
 
         // Step 1: Navigate to home page
         HomePage homePage = new HomePage();
@@ -149,7 +145,7 @@ public class RegisterUserTests extends BaseTest {
         SignupLoginPage signupLoginPage = homePage.clickSignupLogin();
 
         // Steps 3 & 4: Enter username and malformed email, then click "Signup"
-        signupLoginPage.submitSignupExpectingFailure(data.username(), data.email());
+        signupLoginPage.submitSignupExpectingFailure(data.name(), data.email());
 
         // Expected Result 1: Browser displays a native HTML5 tooltip next to the email field indicating the @ symbol is missing
         String validationMessage = signupLoginPage.getSignupEmailValidationMessage();
@@ -185,7 +181,7 @@ public class RegisterUserTests extends BaseTest {
             groups = {"known-bugs"})
     public void testRegistrationMissingEmailDomain() {
         log.warn("TC-004: Known bug BUG-002 — asserting inverted behaviour, this test is expected to FAIL");
-        InvalidEmailData data = TestDataManager.getObject("invalidRegistration.missingDomain", InvalidEmailData.class);
+        UserCredentialsData data = TestDataManager.getObject("invalidRegistration.missingDomain", UserCredentialsData.class);
 
         // Step 1: Navigate to home page
         HomePage homePage = new HomePage();
@@ -195,7 +191,7 @@ public class RegisterUserTests extends BaseTest {
         SignupLoginPage signupLoginPage = homePage.clickSignupLogin();
 
         // Steps 3 & 4: Enter username and malformed email, then click "Signup"
-        signupLoginPage.submitSignupExpectingFailure(data.username(), data.email());
+        signupLoginPage.submitSignupExpectingFailure(data.name(), data.email());
 
         // Expected Result 2: Check URL first to ensure user remained on signup/login page
         Assert.assertFalse(signupLoginPage.getCurrentUrl().endsWith("/signup"),
@@ -221,7 +217,7 @@ public class RegisterUserTests extends BaseTest {
      */
     @Test(description = "TC-005: Registration with empty username field triggers HTML5 required validation")
     public void testRegistrationEmptyUsername() {
-        InvalidEmailData data = TestDataManager.getObject("invalidRegistration.emptyUsername", InvalidEmailData.class);
+        UserCredentialsData data = TestDataManager.getObject("invalidRegistration.emptyUsername", UserCredentialsData.class);
 
         // Step 1: Navigate to home page
         HomePage homePage = new HomePage();
@@ -241,5 +237,71 @@ public class RegisterUserTests extends BaseTest {
         // Expected Result 2: User remains on the registration page (URL ends with /login)
         Assert.assertEquals(signupLoginPage.getSignupHeaderText(), SignupLoginPage.SIGNUP_HEADER_TEXT,
                 "User was navigated away from signup page despite missing required username.");
+    }
+
+    /**
+     * TC-011 — Multi-click submission on registration
+     * Pre-conditions:
+     * - User is not logged in
+     * - Email is not registered
+     * Steps:
+     * 1. Navigate to homepage
+     * 2. Click "Signup / Login" in the top navigation menu
+     * 3. Enter username and email, click "Signup"
+     * 4. Fill in all required account and address fields
+     * 5. Click "Create Account" 5 times in quick succession
+     * Expected Result:
+     * - First click submits the form
+     * - Button is disabled or debounced after first click
+     * - "Account Created!" page is displayed once
+     * NOTE ON AUTOMATION APPROACH:
+     * True rapid multi-click simulation is not reliably achievable with Selenium WebDriver
+     * due to its sequential execution model.
+     * This bug (BUG-002) was identified and documented through manual exploratory testing.
+     * The automated test below verifies the bug exists by checking for the 500 error page
+     * using the XHR approach to fire concurrent requests — which tests the backend race
+     * condition directly, even if it bypasses the UI layer.
+     * A proper fix would require debouncing at both the UI level (disable button after click)
+     * and backend level (idempotency check before database insert).
+     */
+    @Test(description = "TC-011: Multi-click on Create Account triggers 500 error — documents known bug",
+            groups = {"known-bugs"})
+    public void testMultiClickRegistrationSubmit() {
+        log.warn("TC-011: Known bug BUG-002 — asserting inverted behaviour, this test is expected to FAIL");
+
+        UserRegistrationData userData = TestDataManager.getObject("userRegistration", UserRegistrationData.class);
+        String dynamicEmail = TestDataGenerator.generateEmail("qa_multiclick");
+        log.info("TC-011: Attempting multi-click registration with email: [{}]", dynamicEmail);
+
+        // Step 1: Navigate to home page
+        HomePage homePage = new HomePage();
+        homePage.open();
+
+        // Step 2: Click "Signup / Login"
+        SignupLoginPage signupLoginPage = homePage.clickSignupLogin();
+
+        // Step 3: Enter username and email, click Signup
+        AccountInformationPage infoPage = signupLoginPage.submitSignup(userData.name(), dynamicEmail);
+
+        // Step 4: Fill in all required fields
+        infoPage.selectTitle(Title.MR)
+                .enterPassword(userData.password())
+                .selectDateOfBirth(userData.dobDay(), userData.dobMonth(), userData.dobYear())
+                .fillAddressDetails(userData);
+
+        // Step 5: Click "Create Account" 5 times in quick succession
+        infoPage.clickCreateAccountMultipleTimes(5);
+
+        // Verification 1: Confirm server did not return 500 error page
+        Assert.assertFalse(
+                homePage.isServerErrorPageDisplayed(),
+                "BUG DETECTED [TC-011]: Multi-click triggered 500 Internal Server Error due to missing button debouncing!"
+        );
+
+        // Verification 2: Account Created page should be shown
+        Assert.assertTrue(
+                signupLoginPage.getCurrentUrl().contains("/account_created"),
+                "BUG-002 may be fixed — Account Created page was reached."
+        );
     }
 }

@@ -10,11 +10,10 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import java.util.Optional;
+
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -94,6 +93,13 @@ public final class DriverFactory {
         ChromeOptions options = new ChromeOptions();
         List<String> args = getChromiumOptions();
         options.addArguments(args);
+
+        // Disable password save prompts
+        Map<String, Object> prefs = new HashMap<>();
+        prefs.put("credentials_enable_service", false);
+        prefs.put("profile.password_manager_enabled", false);
+        options.setExperimentalOption("prefs", prefs);
+
         log.debug("Launching Chrome with arguments: {}", args);
         return new ChromeDriver(options);
     }

@@ -2,6 +2,7 @@ package org.aeautomation.pages;
 
 import org.aeautomation.core.BasePage;
 import org.openqa.selenium.By;
+import java.util.Optional;
 
 /**
  * Page Object representing the main application landing page.
@@ -15,6 +16,14 @@ public class HomePage extends BasePage {
     private final By homePageLogo = By.xpath("//div[@class='logo pull-left']//img");
     private final By signupLoginLink = By.xpath("//a[contains(text(),'Signup / Login')]");
     private final By loggedInAsText = By.xpath("//li[contains(.,'Logged in as')]");
+    private final By serverErrorIndicator = By.xpath(
+            "//h1[contains(text(),'500')] " +
+                    "| //*[contains(text(),'IntegrityError')]" +
+                    "| //*[contains(text(),'Server Error')]" +
+                    "| //*[contains(text(),'UNIQUE constraint failed')]"
+    );
+
+
 
     /**
      * Navigates to the home page URL and automatically checks for GDPR cookie popups.
@@ -75,5 +84,19 @@ public class HomePage extends BasePage {
      */
     public String getLoggedInUsername() {
         return getText(loggedInAsText);
+    }
+
+    /**
+     * Checks if the application returned a 500 or unhandled exception page.
+     *
+     * @return true if a server error page is detected
+     */
+    public boolean isServerErrorPageDisplayed() {
+        boolean titleContainsError = Optional.ofNullable(driver.getTitle())
+                .map(String::toLowerCase)
+                .filter(title -> title.contains("500") || title.contains("integrityerror"))
+                .isPresent();
+
+        return titleContainsError || isDisplayed(serverErrorIndicator);
     }
 }

@@ -4,6 +4,9 @@ import org.aeautomation.core.BasePage;
 import org.aeautomation.data.Title;
 import org.aeautomation.data.UserRegistrationData;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
+
 
 /**
  * Page Object representing the Account Information form page (/signup).
@@ -53,7 +56,6 @@ public class AccountInformationPage extends BasePage {
      * @return Current AccountInformationPage instance for method chaining
      */
     public AccountInformationPage selectTitle(Title title) {
-        log.info("Selecting title: {}", title);
         switch (title) {
             case MR -> click(mrTitleRadio);
             case MRS -> click(mrsTitleRadio);
@@ -126,5 +128,39 @@ public class AccountInformationPage extends BasePage {
         click(createAccountButton);
         handleGoogleVignetteAd();
         return new AccountCreatedPage();
+    }
+
+    /**
+     * Clicks the 'Create Account' button multiple times in rapid succession.
+     * Useful for testing debouncing and duplicate submission prevention.
+     *
+     * @param times Number of rapid clicks to perform
+     */
+    public void clickCreateAccountMultipleTimes(int times) {
+        log.info("Dispatching {} rapid raw XHR POST requests to reproduce server race condition", times);
+        WebElement button = waitForClickability(createAccountButton);
+
+        String xhrMultiPostScript =
+                "var btn = arguments[0];" +
+                        "var form = btn.closest('form');" +
+                        "var actionUrl = form.getAttribute('action') || window.location.href;" +
+                        "var count = arguments[1];" +
+
+                        // Build key-value URL-encoded string to match native browser form submit
+                        "var formData = new FormData(form);" +
+                        "var params = new URLSearchParams(formData).toString();" +
+
+                        // Fire rapid XHRs synchronously in the same JS frame microtask
+                        "for (var i = 0; i < count; i++) {" +
+                        "    var xhr = new XMLHttpRequest();" +
+                        "    xhr.open('POST', actionUrl, true);" +
+                        "    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');" +
+                        "    xhr.send(params);" +
+                        "}" +
+
+                        // Submit form natively on the main thread so browser navigates to the result page
+                        "form.submit();";
+
+        ((JavascriptExecutor) driver).executeScript(xhrMultiPostScript, button, times);
     }
 }

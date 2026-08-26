@@ -51,6 +51,14 @@
       "email": "testUnregisteredUser@gmail.com",
       "password": "testPass",
       "expectedError": "Your email or password is incorrect!"
+    },
+    "emptyEmailLogin": {
+      "email": "",
+      "password": "testPass"
+    },
+    "emptyPasswordLogin": {
+      "email": "testuser123.qa@gmail.com",
+      "password": ""
     }
   }
 }
