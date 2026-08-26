@@ -20,4 +20,16 @@
         </classes>
     </test>
 
+    <test name="Product Tests">
+        <classes>
+            <class name="org.aeautomation.tests.ProductTests"/>
+        </classes>
+    </test>
+
+    <test name="Cart Tests">
+        <classes>
+            <class name="org.aeautomation.tests.CartTests"/>
+        </classes>
+    </test>
+
 </suite>
