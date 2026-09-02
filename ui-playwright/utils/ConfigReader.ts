@@ -7,6 +7,9 @@ dotenv.config();
  * Utility class responsible for loading framework configurations.
  * Implements a fallback mechanism: environment variables (process.env) take precedence
  * over values defined in the .env file.
+ *
+ * All configuration keys must be defined in .env or passed as environment variables.
+ * See .env.example for the full list of required keys.
  */
 class ConfigReader {
 

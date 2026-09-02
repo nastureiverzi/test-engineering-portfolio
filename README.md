@@ -79,14 +79,18 @@ mvn test -Dbrowser=FIREFOX -Dheadless=true -DbaseUrl=https://staging.myapp.com  
 > First time setup: `npm install && npx playwright install`
 
 ```bash
-npx playwright test                                          # default (Chromium)
-npx playwright test --project=firefox                        # Firefox
-npx playwright test --project=webkit                         # Safari (WebKit)
-npx playwright test --headed                                 # headed mode
-BASE_URL=https://staging.myapp.com npx playwright test       # custom base URL
-HEADLESS=false npx playwright test --project=chromium        # combined
-npx playwright show-report                                   # open last HTML report
+npx playwright test                                                              # default (Chromium)
+npx playwright test --project=firefox                                            # Firefox
+npx playwright test --project=webkit                                             # Safari (WebKit)
+npx playwright test --headed                                                     # headed mode
+BASE_URL=https://staging.myapp.com npx playwright test                           # custom base URL
+HEADLESS=false npx playwright test --project=chromium                            # headed Chromium
+TIMEOUT=60000 npx playwright test                                                # custom timeout
+BASE_URL=https://staging.myapp.com HEADLESS=true npx playwright test             # combined
+npx playwright show-report                                                       # open last HTML report
 ```
+
+> All other settings (`TEST_EMAIL_DOMAIN`, `LOG_LEVEL`) are configured via `.env` — see `.env.example`.
 
 `api-testing/`
 - Supertest: `npm test`
