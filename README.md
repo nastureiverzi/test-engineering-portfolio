@@ -66,6 +66,9 @@ test-engineering-portfolio/
 Each project is self-contained with its own setup instructions.
 
 `ui-selenium/`
+> First time setup: copy `config.example.properties` to `config.properties`.
+> The example file contains working default values and can be used as-is to run the suite against `automationexercise.com`.
+
 ```bash
 mvn test                                                # default (Chrome)
 mvn test -Dbrowser=FIREFOX                              # custom browser
@@ -74,9 +77,11 @@ mvn test -DbaseUrl=https://staging.myapp.com            # custom base URL
 mvn test -Dbrowser=FIREFOX -Dheadless=true -DbaseUrl=https://staging.myapp.com  # combined
 ```
 
-`ui-playwright/`
+> All other settings (`timeout`, `test.email.domain`) are configured via `config.properties` — see `config.example.properties`.
 
-> First time setup: `npm install && npx playwright install`
+`ui-playwright/`
+> First time setup: `npm install && npx playwright install`, then copy `.env.example` to `.env`.
+> The example file contains working default values and can be used as-is to run the suite against `automationexercise.com`.
 
 ```bash
 npx playwright test                                                              # default (Chromium)

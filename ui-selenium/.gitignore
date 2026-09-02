@@ -42,3 +42,6 @@ build/
 # Log files
 *.log
 logs/
+
+# properties file
+src/test/resources/config.properties

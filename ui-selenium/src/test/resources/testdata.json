@@ -1,4 +1,3 @@
-
 {
   "_comment": "NOTE: Hardcoded test credentials and user data are included directly in this file for portfolio demonstration and ease of execution. In a production enterprise pipeline, sensitive credentials and user data would be stored in environment variables, secret managers (e.g., AWS Secrets Manager), or a local .gitignored configuration file.",
   "existingUser": {
