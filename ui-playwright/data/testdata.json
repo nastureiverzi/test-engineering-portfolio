@@ -1,0 +1,66 @@
+{
+  "_comment": "NOTE: Hardcoded test credentials and user data are included directly in this file for portfolio demonstration and ease of execution. In a production enterprise pipeline, sensitive credentials and user data would be stored in environment variables, secret managers (e.g., AWS Secrets Manager), or a local .gitignored configuration file.",
+  "existingUser": {
+    "name": "testAccount",
+    "email": "testuser123.qa@gmail.com"
+  },
+  "userRegistration": {
+    "name": "TestUser",
+    "password": "Password123!",
+    "dobDay": "15",
+    "dobMonth": "May",
+    "dobYear": "1995",
+    "firstName": "Test",
+    "lastName": "User",
+    "company": "Acme Inc",
+    "address1": "123 Main St",
+    "address2": "Apt 4B",
+    "country": "United States",
+    "state": "California",
+    "city": "Los Angeles",
+    "zipcode": "90210",
+    "mobileNumber": "1234567890"
+  },
+  "invalidRegistration": {
+    "missingAtSymbol": {
+      "username": "testAccount",
+      "email": "test124.gmail.com"
+    },
+    "missingDomain": {
+      "username": "testAccount",
+      "email": "test124@gmail"
+    },
+    "emptyUsername": {
+      "username": "",
+      "email": "test124@gmail.com"
+    }
+  },
+  "authentication": {
+    "validUser": {
+      "email": "testuser123.qa@gmail.com",
+      "password": "testPass",
+      "expectedUsername": "testAccount"
+    },
+    "invalidPassword": {
+      "email": "testuser123.qa@gmail.com",
+      "password": "testfail",
+      "expectedError": "Your email or password is incorrect!"
+    },
+    "unregisteredEmail": {
+      "email": "testUnregisteredUser@gmail.com",
+      "password": "testPass",
+      "expectedError": "Your email or password is incorrect!"
+    },
+    "emptyEmailLogin": {
+      "email": "",
+      "password": "testPass"
+    },
+    "emptyPasswordLogin": {
+      "email": "testuser123.qa@gmail.com",
+      "password": ""
+    }
+  },
+  "productSearch": {
+    "keyword": "top"
+  }
+}
