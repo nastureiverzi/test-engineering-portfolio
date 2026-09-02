@@ -7,7 +7,11 @@
  * - TIMEOUT: Test execution timeout in milliseconds (default: 30000)
  * - HEADLESS: Set 'false' to run browser visually (default: true)
  */
-module.exports = defineConfig({
+import { defineConfig, devices } from '@playwright/test';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+export default defineConfig({
     testDir: './tests',
     timeout: parseInt(process.env.TIMEOUT || '30000'),
     fullyParallel: false, // Disabled to avoid conflicts on shared test environment
