@@ -75,8 +75,17 @@ mvn test -Dbrowser=FIREFOX -Dheadless=true -DbaseUrl=https://staging.myapp.com  
 ```
 
 `ui-playwright/`
+
+> First time setup: `npm install && npx playwright install`
+
 ```bash
-npx playwright test
+npx playwright test                                          # default (Chromium)
+npx playwright test --project=firefox                        # Firefox
+npx playwright test --project=webkit                         # Safari (WebKit)
+npx playwright test --headed                                 # headed mode
+BASE_URL=https://staging.myapp.com npx playwright test       # custom base URL
+HEADLESS=false npx playwright test --project=chromium        # combined
+npx playwright show-report                                   # open last HTML report
 ```
 
 `api-testing/`
