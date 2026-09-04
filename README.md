@@ -65,7 +65,8 @@ test-engineering-portfolio/
 
 Each project is self-contained with its own setup instructions.
 
-`ui-selenium/`
+### `ui-selenium/`
+
 > First time setup: copy `config.example.properties` to `config.properties`.
 > The example file contains working default values and can be used as-is to run the suite against `automationexercise.com`.
 
@@ -79,21 +80,47 @@ mvn test -Dbrowser=FIREFOX -Dheadless=true -DbaseUrl=https://staging.myapp.com  
 
 > All other settings (`timeout`, `test.email.domain`) are configured via `config.properties` — see `config.example.properties`.
 
-`ui-playwright/`
+### `ui-playwright/`
+
 > First time setup: `npm install && npx playwright install`, then copy `.env.example` to `.env`.
 > The example file contains working default values and can be used as-is to run the suite against `automationexercise.com`.
 
+**Using npm scripts:**
+
 ```bash
-npx playwright test                                                              # default (Chromium)
-npx playwright test --project=firefox                                            # Firefox
-npx playwright test --project=webkit                                             # Safari (WebKit)
-npx playwright test --headed                                                     # headed mode
-BASE_URL=https://staging.myapp.com npx playwright test                           # custom base URL
-HEADLESS=false npx playwright test --project=chromium                            # headed Chromium
-TIMEOUT=60000 npx playwright test                                                # custom timeout
-BASE_URL=https://staging.myapp.com HEADLESS=true npx playwright test             # combined
-npx playwright show-report                                                       # open last HTML report
+npm test                    # default (all browsers)
+npm run test:chromium       # Chromium only
+npm run test:firefox        # Firefox only
+npm run test:webkit         # Safari (WebKit) only
+npm run test:headed         # headed mode
+npm run test:ui             # Playwright UI mode (interactive test runner)
+npm run report              # open last HTML report
 ```
+
+**Filtering tests by tag:**
+
+```bash
+npx playwright test --grep @registration          # registration tests only
+npx playwright test --grep @authentication        # authentication tests only
+npx playwright test --grep-invert @known-bugs     # exclude known bug tests
+```
+
+**With environment variable overrides (Linux/macOS/Git Bash):**
+
+```bash
+BASE_URL=https://staging.myapp.com npm test                    # custom base URL
+HEADLESS=false npm run test:chromium                           # headed Chromium
+TIMEOUT=60000 npm test                                         # custom timeout
+BASE_URL=https://staging.myapp.com HEADLESS=true npm test      # combined
+```
+
+> **Windows PowerShell/CMD users:** Inline environment variable syntax is not supported. Use one of these alternatives instead:
+>
+> Set the variable first, then run:
+> ```powershell
+> $env:BASE_URL="https://staging.myapp.com"; npm test
+> ```
+> Or update `.env` directly with the values you need before running `npm test`.
 
 > All other settings (`TEST_EMAIL_DOMAIN`, `LOG_LEVEL`) are configured via `.env` — see `.env.example`.
 
