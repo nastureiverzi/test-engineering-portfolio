@@ -25,6 +25,7 @@ export class SignupLoginPage extends BasePage {
     private readonly loginPasswordInput: Locator;
     private readonly loginButton: Locator;
     private readonly loginErrorMessageText: Locator;
+    private readonly emailAlreadyExistsError: Locator;
 
     /**
      * Initializes locators for the Signup/Login page elements.
@@ -46,6 +47,7 @@ export class SignupLoginPage extends BasePage {
         this.loginPasswordInput = page.locator('input[data-qa="login-password"]');
         this.loginButton = page.locator('button[data-qa="login-button"]');
         this.loginErrorMessageText = page.locator('form[action="/login"] p');
+        this.emailAlreadyExistsError = page.locator('p:has-text("Email Address already exist!")');
     }
 
     /**
@@ -148,5 +150,13 @@ export class SignupLoginPage extends BasePage {
      */
     async getLoginPasswordValidationMessage(): Promise<string> {
         return this.getValidationMessage(this.loginPasswordInput);
+    }
+
+    /**
+     * Checks if the 'Email Address already exist!' error message is visible.
+     * @returns Promise resolving to true if displayed
+     */
+    async isEmailAlreadyExistsErrorDisplayed(): Promise<boolean> {
+        return this.isDisplayed(this.signupErrorMessageText);
     }
 }

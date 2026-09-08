@@ -37,7 +37,6 @@ export class AccountCreatedPage extends BasePage {
      */
     async clickContinue(): Promise<HomePage> {
         await this.click(this.continueButton);
-        await this.handleGoogleVignetteAd();
         return new HomePage(this.page);
     }
 }

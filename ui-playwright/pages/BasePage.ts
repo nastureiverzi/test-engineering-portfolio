@@ -118,14 +118,4 @@ export abstract class BasePage {
             await consentButton.click();
         }
     }
-
-    /**
-     * Redirects back to the target base URL if intercepted by Google Vignette ad overlays.
-     */
-    protected async handleGoogleVignetteAd(): Promise<void> {
-        if (this.page.url().includes('#google_vignette')) {
-            Logger.warn('Google Vignette ad detected, redirecting to base URL');
-            await this.page.goto(ConfigReader.getBaseUrl());
-        }
-    }
 }
