@@ -1,6 +1,7 @@
 import { Page, Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
 import { AccountInformationPage } from './AccountInformationPage';
+import ConfigReader from '../utils/ConfigReader';
 
 /**
  * Page Object representing the Signup / Login page ('/login').
@@ -26,6 +27,7 @@ export class SignupLoginPage extends BasePage {
     private readonly loginButton: Locator;
     private readonly loginErrorMessageText: Locator;
     private readonly emailAlreadyExistsError: Locator;
+    private readonly explicitWaitTimeout = ConfigReader.getExplicitWaitTimeout();
 
     /**
      * Initializes locators for the Signup/Login page elements.
@@ -42,11 +44,11 @@ export class SignupLoginPage extends BasePage {
         this.signupErrorMessageText = page.locator('.signup-form p');
 
         // Login Locators
-        this.loginHeader = page.locator('.login-form h2');
+        this.loginHeader = page.locator('.login-form h2, h2:has-text("Login to your account")');
         this.loginEmailInput = page.locator('input[data-qa="login-email"]');
         this.loginPasswordInput = page.locator('input[data-qa="login-password"]');
         this.loginButton = page.locator('button[data-qa="login-button"]');
-        this.loginErrorMessageText = page.locator('form[action="/login"] p');
+        this.loginErrorMessageText = page.locator('form[action="/login"] p, .login-form p');
         this.emailAlreadyExistsError = page.locator('p:has-text("Email Address already exist!")');
     }
 
@@ -125,7 +127,12 @@ export class SignupLoginPage extends BasePage {
      * @returns Promise resolving to true if visible, false otherwise
      */
     async isLoginErrorMessageDisplayed(): Promise<boolean> {
-        return this.isDisplayed(this.loginErrorMessageText);
+       try {
+            await this.loginErrorMessageText.waitFor({ state: 'visible', timeout: this.explicitWaitTimeout });
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     /**
@@ -157,6 +164,12 @@ export class SignupLoginPage extends BasePage {
      * @returns Promise resolving to true if displayed
      */
     async isEmailAlreadyExistsErrorDisplayed(): Promise<boolean> {
-        return this.isDisplayed(this.signupErrorMessageText);
+        try {
+            await this.signupErrorMessageText.waitFor({ state: 'visible', timeout: 5000 });
+            const text = await this.getText(this.signupErrorMessageText);
+            return text === SignupLoginPage.EXISTING_EMAIL_ERROR_TEXT;
+        } catch {
+            return false;
+        }
     }
 }

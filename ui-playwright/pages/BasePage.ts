@@ -109,13 +109,16 @@ export abstract class BasePage {
      * Dismisses GDPR/Cookie consent popups if present.
      */
     protected async handleCookieConsentIfPresent(): Promise<void> {
-        const consentButton = this.page.locator(
-            'button:has-text("Consent"), button:has-text("AGREE"), button:has-text("Accept")'
+       const consentButton = this.page.locator(
+        'button:has-text("Consent"), button:has-text("AGREE"), button:has-text("Accept"), button:has-text("OK")'
         ).first();
 
-        if (await consentButton.isVisible()) {
-            Logger.debug('Cookie consent popup detected, dismissing');
+        try {
+            await consentButton.waitFor({ state: 'visible', timeout: 3000 });
             await consentButton.click();
+            Logger.debug('Cookie consent popup detected and dismissed');
+        } catch {
+            Logger.debug('No cookie consent popup detected');
         }
     }
 }

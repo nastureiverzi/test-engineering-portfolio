@@ -4,6 +4,7 @@ import { SignupLoginPage } from './SignupLoginPage';
 import { ProductsPage } from './ProductsPage';
 import { CartPage } from './CartPage';
 import Logger from '../utils/Logger';
+import ConfigReader from '../utils/ConfigReader';
 
 /**
  * Page Object representing the main application landing page.
@@ -20,6 +21,8 @@ export class HomePage extends BasePage {
     private readonly modalMessage: Locator;
     private readonly modalContinueShoppingBtn: Locator;
     private readonly modalViewCartLink: Locator;
+
+    private readonly explicitWaitTimeout = ConfigReader.getExplicitWaitTimeout();
 
     constructor(page: Page) {
         super(page);
@@ -59,8 +62,10 @@ export class HomePage extends BasePage {
      * @returns New SignupLoginPage instance
      */
     async clickSignupLogin(): Promise<SignupLoginPage> {
-        await this.click(this.signupLoginLink);
-        return new SignupLoginPage(this.page);
+       await this.click(this.signupLoginLink);
+        const signupLoginPage = new SignupLoginPage(this.page);
+        await this.handleCookieConsentIfPresent();
+        return signupLoginPage;
     }
 
     /**
@@ -86,13 +91,13 @@ export class HomePage extends BasePage {
      * @returns true if navigation bar contains the username
      */
     async isLoggedInAsDisplayed(username: string): Promise<boolean> {
+        await this.loggedInAsText.waitFor({ state: 'visible', timeout: this.explicitWaitTimeout });
         if (!await this.isDisplayed(this.loggedInAsText)) {
             return false;
         }
         const text = await this.getText(this.loggedInAsText);
         return text.includes(username);
     }
-
     /**
      * Retrieves the full "Logged in as [username]" text from the navigation bar.
      * @returns Logged in text string

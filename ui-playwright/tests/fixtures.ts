@@ -10,6 +10,12 @@ export const test = base.extend({
         await page.route('**/*googleadservices*', route => route.abort());
         await page.route('**/*doubleclick*', route => route.abort());
         await page.route('**/*google-analytics*', route => route.abort());
+        await page.route('**/*adservice*', route => route.abort());
+        await page.route('**/*googletag*', route => route.abort());
+        await page.route('**/*amazon-adsystem*', route => route.abort());
+        await page.route('**/*adsystem*', route => route.abort());
+        await page.route('**/*adnxs*', route => route.abort());
+        await page.route('**/*ads*', route => route.abort());
         await use(page);
     }
 });

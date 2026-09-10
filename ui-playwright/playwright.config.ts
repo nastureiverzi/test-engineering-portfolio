@@ -16,7 +16,8 @@ export default defineConfig({
     timeout: parseInt(process.env.TIMEOUT || '30000'),
     fullyParallel: false, // Disabled to avoid conflicts on shared test environment
     retries: 0,
-    workers: 1,
+    workers: 1, // Sequential execution — parallel runs cause conflicts on shared test environment.
+                // Enable parallel execution with isolated environments in production pipelines.
     reporter: [['html', { open: 'never' }], ['list']],
 
     expect: {
@@ -29,6 +30,8 @@ export default defineConfig({
         viewport: { width: 1280, height: 720 },
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',
+        actionTimeout: 15000,
+        bypassCSP: true
     },
 
     projects: [

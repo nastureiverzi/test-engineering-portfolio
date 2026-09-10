@@ -4,7 +4,7 @@ import type { ExistingUserData, InvalidEmailData, UserRegistrationData } from '.
 import TestDataManager from '../utils/TestDataManager';
 import TestDataGenerator from '../utils/TestDataGenerator';
 
-test.describe('RegisterUser Test Suite', () => {
+test.describe('Registration Test Suite', () => {
 
     /**
      * Test Case 1: Register User

@@ -1,6 +1,7 @@
 import { Page, Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
 import { AccountCreatedPage } from './AccountCreatedPage';
+import ConfigReader from '../utils/ConfigReader';
 
 /**
  * Interface representing the required fields to populate account information.
@@ -58,6 +59,8 @@ export class AccountInformationPage extends BasePage {
     private readonly mobileNumberInput: Locator;
     private readonly createAccountButton: Locator;
 
+    private readonly explicitWaitTimeout = ConfigReader.getExplicitWaitTimeout();
+
     /**
      * Initializes locators for the registration form elements.
      * @param page - Playwright Page fixture instance
@@ -92,7 +95,12 @@ export class AccountInformationPage extends BasePage {
      * @returns Promise resolving to true if visible, false otherwise
      */
     async isEnterAccountInfoDisplayed(): Promise<boolean> {
-        return this.isDisplayed(this.enterAccountInfoHeading);
+         try {
+            await this.enterAccountInfoHeading.waitFor({ state: 'visible', timeout: this.explicitWaitTimeout });
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     /**
