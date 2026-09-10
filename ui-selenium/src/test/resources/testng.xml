@@ -2,6 +2,9 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="AE Automation Suite" verbose="1">
 
+    <!-- Sequential execution — parallel runs cause conflicts on shared test environment. -->
+    <!-- Enable parallel="methods" thread-count="3" with isolated environments in production. -->
+
     <groups>
         <run>
             <exclude name="known-bugs"/>
