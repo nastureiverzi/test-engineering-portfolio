@@ -26,37 +26,28 @@ test.describe('Registration Test Suite', () => {
      * 15. Click 'Continue' button
      * 16. Verify that 'Logged in as username' is visible
      */
-    test('TC-001: Register User with valid details', { tag: '@registration' }, async ({page}) => {
+    test('TC-001: Register User with valid details', { tag: '@registration' }, async ({ page }) => {
 
         const homePage = new HomePage(page);
         const userData = TestDataManager.getObject<UserRegistrationData>('userRegistration');
         const email = TestDataGenerator.generateEmail('qa');
 
-        // Steps 1 - 2: Navigate and verify home page
+        // Steps 1 - 3: Navigate and verify home page logo is visible
         await homePage.open();
-        expect(
-            await homePage.isHomePageDisplayed(),
-            'Home page logo should be visible'
-        ).toBeTruthy();
+        await expect(homePage.homePageLogo, 'Home page logo should be visible').toBeVisible();
 
-        // Step 3 - 4: Navigate to Signup/Login and verify header
+        // Steps 4 - 5: Navigate to Signup/Login and verify header
         const signupLoginPage = await homePage.clickSignupLogin();
-        expect(
-            await signupLoginPage.isNewUserSignupHeaderDisplayed(),
-            "'New User Signup!' header should be displayed"
-        ).toBeTruthy();
+        await expect(signupLoginPage.newUserSignupHeader, "'New User Signup!' header should be displayed").toBeVisible();
 
-        // Steps 5 - 6: Enter signup details and submit
+        // Steps 6 - 7: Enter signup details and submit
         await signupLoginPage.enterSignupDetails(userData.name, email);
         const accountInfoPage = await signupLoginPage.clickSignup();
 
-        // Step 7: Verify Enter Account Information header
-        expect(
-            await accountInfoPage.isEnterAccountInfoDisplayed(),
-            "'ENTER ACCOUNT INFORMATION' heading should be displayed"
-        ).toBeTruthy();
+        // Step 8: Verify Enter Account Information header
+        await expect(accountInfoPage.enterAccountInfoHeading, "'ENTER ACCOUNT INFORMATION' heading should be displayed").toBeVisible();
 
-        // Steps 8 - 10: Fill personal account details
+        // Steps 9 - 11: Fill personal account details and opt-ins
         await accountInfoPage.fillAccountInformation({
             title: userData.title,
             password: userData.password,
@@ -65,7 +56,7 @@ test.describe('Registration Test Suite', () => {
             year: userData.dobYear
         });
 
-        // Step 11: Fill address details
+        // Step 12: Fill personal address and billing details
         await accountInfoPage.fillAddressInformation({
             firstName: userData.firstName,
             lastName: userData.lastName,
@@ -79,19 +70,14 @@ test.describe('Registration Test Suite', () => {
             mobileNumber: userData.mobileNumber
         });
 
-        // Steps 12 - 13: Submit and verify Account Created header
+        // Steps 13 - 14: Submit and verify Account Created header
         const accountCreatedPage = await accountInfoPage.clickCreateAccount();
-        expect(
-            await accountCreatedPage.isAccountCreatedDisplayed(),
-            "'ACCOUNT CREATED!' confirmation should be displayed"
-        ).toBeTruthy();
+        await expect(accountCreatedPage.accountCreatedHeading, "'ACCOUNT CREATED!' confirmation heading should be displayed").toBeVisible();
 
-        // Steps 14 - 15: Click Continue and verify logged-in status
-        const loggedInPage = await accountCreatedPage.clickContinue();
-        expect(
-            await loggedInPage.isLoggedInAsDisplayed(userData.name),
-            `Header should display 'Logged in as ${userData.name}'`
-        ).toBeTruthy();
+        // Steps 15 - 16: Click Continue and verify logged-in username badge in top navigation
+        const loggedInHomePage = await accountCreatedPage.clickContinue();
+        await expect(loggedInHomePage.loggedInAsText, `Navigation header should display username '${userData.name}'`).toContainText(userData.name);
+        await expect(loggedInHomePage.loggedInAsText).toBeVisible();
     });
 
     /**
@@ -111,29 +97,23 @@ test.describe('Registration Test Suite', () => {
         const homePage = new HomePage(page);
         const existingUserData = TestDataManager.getObject<ExistingUserData>('existingUser');
 
-        // Steps 1 - 2: Navigate and verify home page
+        // Steps 1 - 3: Navigate and verify home page
         await homePage.open();
-        expect(
-            await homePage.isHomePageDisplayed(),
-            'Home page logo should be visible'
-        ).toBeTruthy();
+        await expect(homePage.homePageLogo, 'Home page logo should be visible').toBeVisible();
 
-        // Steps 3 - 4: Navigate to Signup/Login and verify header
+        // Steps 4 - 5: Navigate to Signup/Login and verify header
         const signupLoginPage = await homePage.clickSignupLogin();
-        expect(
-            await signupLoginPage.isNewUserSignupHeaderDisplayed(),
-            "'New User Signup!' header should be displayed"
-        ).toBeTruthy();
+        await expect(signupLoginPage.newUserSignupHeader, "'New User Signup!' header should be displayed").toBeVisible();
 
-        // Steps 5 - 7: Enter registered email details and submit
+        // Steps 6 - 7: Enter registered email details and submit
         await signupLoginPage.enterSignupDetails(existingUserData.name, existingUserData.email);
         await signupLoginPage.clickSignup();
 
         // Step 8: Verify error message is displayed and user remains on registration page
-        expect(
-            await signupLoginPage.isEmailAlreadyExistsErrorDisplayed(),
+        await expect(
+            signupLoginPage.signupErrorMessageText,
             "'Email Address already exist!' error message should be displayed"
-        ).toBeTruthy();
+        ).toBeVisible();
     });
 
     /**
@@ -153,32 +133,24 @@ test.describe('Registration Test Suite', () => {
         const homePage = new HomePage(page);
         const invalidEmailData = TestDataManager.getObject<InvalidEmailData>('invalidRegistration.missingAtSymbol');
 
-        // Steps 1 - 2: Navigate and verify home page
+        // Steps 1 - 3: Navigate and verify home page
         await homePage.open();
-        expect(
-            await homePage.isHomePageDisplayed(),
-            'Home page logo should be visible'
-        ).toBeTruthy();
+        await expect(homePage.homePageLogo, 'Home page logo should be visible').toBeVisible();
 
-        // Steps 3 - 4: Navigate to Signup/Login and verify header
+        // Steps 4 - 5: Navigate to Signup/Login and verify header
         const signupLoginPage = await homePage.clickSignupLogin();
-        expect(
-            await signupLoginPage.isNewUserSignupHeaderDisplayed(),
-            "'New User Signup!' header should be displayed"
-        ).toBeTruthy();
+        await expect(signupLoginPage.newUserSignupHeader, "'New User Signup!' header should be displayed").toBeVisible();
 
-        // Steps 5 - 7: Enter malformed email details and submit
+        // Steps 6 - 7: Enter malformed email details and submit
         await signupLoginPage.enterSignupDetails(invalidEmailData.username, invalidEmailData.email);
-        void await signupLoginPage.clickSignup();
+        await signupLoginPage.clickSignup();
 
         // Step 8: Verify native HTML5 browser tooltip validation message
         const validationMessage = await signupLoginPage.getSignupEmailValidationMessage();
         expect(
-        validationMessage.includes('@') || 
-        validationMessage.toLowerCase().includes('email') ||
-        validationMessage.toLowerCase().includes('address'),
-        `Browser validation message should indicate invalid email format. Actual: ${validationMessage}`
-        ).toBeTruthy();
+            validationMessage,
+            `Browser validation message should indicate invalid email format. Actual: '${validationMessage}'`
+        ).toMatch(/@|email|address/i);
     });
 
     /**
@@ -196,35 +168,32 @@ test.describe('Registration Test Suite', () => {
      * Known Bug: Native browser validation fails to catch missing TLD/domain suffix 
      * and redirects to AccountInformationPage instead of showing an error.
      */
-    test('TC-004: Registration with missing email domain', { tag: ['@registration', '@known-bugs'] }, async ({ page }) => {
+    test('TC-004: Registration with missing email domain', { tag: ['@registration', '@known-bugs'] }, async ({ page, browserName }) => {
+
+        test.skip(browserName === 'webkit', 'WebKit native client-side email validation prevents reaching backend submission check');
 
         const homePage = new HomePage(page);
         const invalidEmailData = TestDataManager.getObject<InvalidEmailData>('invalidRegistration.missingDomain');
 
-        // Steps 1 - 2: Navigate and verify home page
+        // Steps 1 - 3: Navigate and verify home page
         await homePage.open();
-        expect(
-            await homePage.isHomePageDisplayed(),
-            'Home page logo should be visible'
-        ).toBeTruthy();
+        await expect(homePage.homePageLogo, 'Home page logo should be visible').toBeVisible();
 
-        // Steps 3 - 4: Navigate to Signup/Login and verify header
+        // Steps 4 - 5: Navigate to Signup/Login and verify header
         const signupLoginPage = await homePage.clickSignupLogin();
-        expect(
-            await signupLoginPage.isNewUserSignupHeaderDisplayed(),
-            "'New User Signup!' header should be displayed"
-        ).toBeTruthy();
+        await expect(signupLoginPage.newUserSignupHeader, "'New User Signup!' header should be displayed").toBeVisible();
 
-        // Steps 5 - 7: Enter malformed email details and submit
+        // Steps 6 - 7: Enter malformed email details and submit
         await signupLoginPage.enterSignupDetails(invalidEmailData.username, invalidEmailData.email);
+
         await signupLoginPage.clickSignup();
 
-        // Step 8: Verify user remains on signup page (Fails due to BUG-002)
-        // BUG-001: User is incorrectly redirected to registration form despite invalid email
-        expect(
-            await signupLoginPage.isNewUserSignupHeaderDisplayed(),
+        
+        // Step 8: Verify user remains on signup page (Expected to fail until BUG-002 is resolved)
+        await expect(
+            signupLoginPage.newUserSignupHeader,
             'BUG-002: User was redirected to registration form despite missing email domain suffix'
-        ).toBeTruthy();
+        ).toBeVisible();
     });
 
     /**
@@ -244,34 +213,25 @@ test.describe('Registration Test Suite', () => {
         const homePage = new HomePage(page);
         const email = TestDataGenerator.generateEmail('qa');
 
-        // Steps 1 - 2: Navigate and verify home page
+        // Steps 1 - 3: Navigate and verify home page
         await homePage.open();
-        expect(
-            await homePage.isHomePageDisplayed(),
-            'Home page logo should be visible'
-        ).toBeTruthy();
+        await expect(homePage.homePageLogo, 'Home page logo should be visible').toBeVisible();
 
-        // Steps 3 - 4: Navigate to Signup/Login and verify header
+        // Steps 4 - 5: Navigate to Signup/Login and verify header
         const signupLoginPage = await homePage.clickSignupLogin();
-        expect(
-            await signupLoginPage.isNewUserSignupHeaderDisplayed(),
-            "'New User Signup!' header should be displayed"
-        ).toBeTruthy();
+        await expect(signupLoginPage.newUserSignupHeader, "'New User Signup!' header should be displayed").toBeVisible();
 
-        // Steps 5 - 7: Leave username empty, fill email, and submit
+        // Steps 6 - 7: Leave username empty, fill email, and submit
         await signupLoginPage.enterSignupDetails('', email);
         await signupLoginPage.clickSignup();
 
-        // Step 8: Verify HTML5 validation tooltip on the name field and stay on page
+        // Step 8: Verify HTML5 validation tooltip on the name field and verify user remains on page
         const validationMessage = await signupLoginPage.getSignupUsernameValidationMessage();
         expect(
             validationMessage,
-            "Browser validation message should indicate the username field is required"
+            'Browser validation message should indicate the username field is required'
         ).toBeTruthy();
 
-        expect(
-            await signupLoginPage.isNewUserSignupHeaderDisplayed(),
-            "User should remain on the registration page"
-        ).toBeTruthy();
+        await expect(signupLoginPage.newUserSignupHeader, 'User should remain on the registration page').toBeVisible();
     });
 });

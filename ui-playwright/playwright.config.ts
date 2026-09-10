@@ -31,7 +31,8 @@ export default defineConfig({
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',
         actionTimeout: 15000,
-        bypassCSP: true
+        bypassCSP: true,
+        testIdAttribute: 'data-qa'
     },
 
     projects: [

@@ -2,32 +2,37 @@ import { Page, Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 /**
- * Page Object representing the Shopping Cart page
+ * Page Object representing the Shopping Cart page (`/view_cart`).
+ * Encapsulates interactions for inspecting cart line items, pricing, quantities, and proceeding to checkout.
  */
 export class CartPage extends BasePage {
 
-    private readonly cartItemsHeader: Locator;
-    private readonly cartProductNames: Locator;
+    /** Active breadcrumb indicator locator for the Shopping Cart page (`locator`). */
+    readonly cartItemsHeader: Locator;
 
+    /** Locator targeting all product title links within the cart table (`locator`). */
+    readonly cartProductNames: Locator;
+
+    /**
+     * Initializes locators for shopping cart elements using direct DOM strategies
+     * to maximize selector resolution speed and minimize engine overhead.
+     * 
+     * @param page - Playwright Page fixture instance
+     */
     constructor(page: Page) {
         super(page);
-        this.cartItemsHeader = page.locator('li.active', { hasText: 'Shopping Cart' });
+
+        // Targeted breadcrumb lookup bypassing array filtering on all list items
+        this.cartItemsHeader = page.locator('ol.breadcrumb .active');
+
+        // Direct CSS path bypassing table accessibility tree traversal
         this.cartProductNames = page.locator('td.cart_description a');
     }
 
     /**
-     * Checks if the user is on the Shopping Cart page.
-     *
-     * @returns Promise resolving to true if active breadcrumb header is visible
-     */
-    async isCartPageDisplayed(): Promise<boolean> {
-        return this.isDisplayed(this.cartItemsHeader);
-    }
-
-    /**
-     * Retrieves all product names currently present in the shopping cart table.
-     *
-     * @returns Promise resolving to an array of product name strings
+     * Retrieves all product names currently displayed in the shopping cart table.
+     * 
+     * @returns Promise resolving to an array of trimmed product name strings
      */
     async getCartProductNames(): Promise<string[]> {
         const names = await this.cartProductNames.allInnerTexts();

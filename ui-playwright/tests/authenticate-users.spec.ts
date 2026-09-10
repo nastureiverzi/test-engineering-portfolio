@@ -18,32 +18,31 @@ test.describe('Authentication Test Suite', () => {
      * 8. Verify that 'Logged in as username' is visible
      */
     test('TC-006: Successful login with valid credentials', { tag: '@authentication' }, async ({ page }) => {
-
         const homePage = new HomePage(page);
         const loginData = TestDataManager.getObject<LoginData>('authentication.validUser');
 
-        // Steps 1 - 2: Navigate and verify home page
+        // Steps 1 - 3: Navigate and verify home page
         await homePage.open();
-        expect(
-            await homePage.isHomePageDisplayed(),
+        await expect(
+            homePage.homePageLogo,
             'Home page logo should be visible'
-        ).toBeTruthy();
+        ).toBeVisible();
 
-        // Steps 3 - 4: Navigate to Signup/Login page and verify header
+        // Steps 4 - 5: Navigate to Signup/Login page and verify header
         const signupLoginPage = await homePage.clickSignupLogin();
-        expect(
-            await signupLoginPage.isLoginHeaderDisplayed(),
+        await expect(
+            signupLoginPage.loginHeader,
             "'Login to your account' header should be displayed"
-        ).toBeTruthy();
+        ).toBeVisible();
 
-        // Steps 5 - 7: Fill valid credentials and submit
+        // Steps 6 - 7: Fill valid credentials and submit
         await signupLoginPage.login(loginData.email, loginData.password);
 
         // Step 8: Verify user is logged in and 'Logged in as username' is displayed
-        expect(
-            await homePage.isLoggedInAsDisplayed(loginData.expectedUsername!),
+        await expect(
+            homePage.getLoggedInAsLocator(loginData.expectedUsername!),
             `Header should display 'Logged in as ${loginData.expectedUsername!}'`
-        ).toBeTruthy();
+        ).toBeVisible();
     });
 
     /**
@@ -59,41 +58,90 @@ test.describe('Authentication Test Suite', () => {
      * 8. Verify error 'Your email or password is incorrect!' is visible and user remains on login page
      */
     test('TC-007: Login with incorrect password', { tag: '@authentication' }, async ({ page }) => {
-
         const homePage = new HomePage(page);
         const loginData = TestDataManager.getObject<LoginData>('authentication.invalidPassword');
 
-        // Steps 1 - 2: Navigate and verify home page
+        // Steps 1 - 3: Navigate and verify home page
         await homePage.open();
-        expect(
-            await homePage.isHomePageDisplayed(),
+        await expect(
+            homePage.homePageLogo,
             'Home page logo should be visible'
-        ).toBeTruthy();
+        ).toBeVisible();
 
-        // Steps 3 - 4: Navigate to Signup/Login page and verify header
+        // Steps 4 - 5: Navigate to Signup/Login page and verify header
         const signupLoginPage = await homePage.clickSignupLogin();
-        expect(
-            await signupLoginPage.isLoginHeaderDisplayed(),
+        await expect(
+            signupLoginPage.loginHeader,
             "'Login to your account' header should be displayed"
-        ).toBeTruthy();
+        ).toBeVisible();
 
-        // Steps 5 - 7: Enter credentials and submit login form
+        // Steps 6 - 7: Enter credentials and submit login form
         await signupLoginPage.login(loginData.email, loginData.password);
 
-        // Step 8: Verify error message is displayed and user remains on login page
-        expect(
-            await signupLoginPage.isLoginErrorMessageDisplayed(),
+        // Step 8: Verify error message is displayed, text matches, and user remains on login page
+        await expect(
+            signupLoginPage.loginErrorMessageText,
             "'Your email or password is incorrect!' error message should be displayed"
-        ).toBeTruthy();
+        ).toBeVisible();
 
-        expect(
-            await signupLoginPage.isLoginHeaderDisplayed(),
+        await expect(
+            signupLoginPage.loginErrorMessageText,
+            'Error message text should match expected value'
+        ).toHaveText(loginData.expectedError!);
+
+        await expect(
+            signupLoginPage.loginHeader,
             "User should remain on the login page"
-        ).toBeTruthy();
+        ).toBeVisible();
+    });
 
-        expect(
-        await signupLoginPage.getLoginErrorMessageText(),
-        'Error message text should match expected value'
-        ).toBe(loginData.expectedError);
+    /**
+     * Test Case 8: Login with unregistered email
+     * 
+     * 1. Launch browser
+     * 2. Navigate to url homepage
+     * 3. Verify that home page is visible successfully
+     * 4. Click on 'Signup / Login' button
+     * 5. Verify 'Login to your account' is visible
+     * 6. Enter unregistered email address and password
+     * 7. Click 'Login' button
+     * 8. Verify error 'Your email or password is incorrect!' is visible and user remains on login page
+     */
+    test('TC-008: Login with unregistered email', { tag: '@authentication' }, async ({ page }) => {
+        const homePage = new HomePage(page);
+        const loginData = TestDataManager.getObject<LoginData>('authentication.unregisteredEmail');
+
+        // Steps 1 - 3: Navigate and verify home page
+        await homePage.open();
+        await expect(
+            homePage.homePageLogo,
+            'Home page logo should be visible'
+        ).toBeVisible();
+
+        // Steps 4 - 5: Navigate to Signup/Login page and verify header
+        const signupLoginPage = await homePage.clickSignupLogin();
+        await expect(
+            signupLoginPage.loginHeader,
+            "'Login to your account' header should be displayed"
+        ).toBeVisible();
+
+        // Steps 6 - 7: Enter unregistered credentials and submit login form
+        await signupLoginPage.login(loginData.email, loginData.password);
+
+        // Step 8: Verify error message is displayed, text matches, and user remains on login page
+        await expect(
+            signupLoginPage.loginErrorMessageText,
+            "'Your email or password is incorrect!' error message should be displayed"
+        ).toBeVisible();
+
+        await expect(
+            signupLoginPage.loginErrorMessageText,
+            'Error message text should match expected value'
+        ).toHaveText(loginData.expectedError!);
+
+        await expect(
+            signupLoginPage.loginHeader,
+            "User should remain on the login page"
+        ).toBeVisible();
     });
 });

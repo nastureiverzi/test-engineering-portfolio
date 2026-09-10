@@ -1,7 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
 import { AccountCreatedPage } from './AccountCreatedPage';
-import ConfigReader from '../utils/ConfigReader';
 
 /**
  * Interface representing the required fields to populate account information.
@@ -35,77 +34,105 @@ export interface AddressInfoDetails {
  */
 export class AccountInformationPage extends BasePage {
 
+    /** Heading text constant used for verification assertions. */
     public static readonly ENTER_ACCOUNT_INFO_HEADER_TEXT = 'ENTER ACCOUNT INFORMATION';
 
-    private readonly enterAccountInfoHeading: Locator;
-    private readonly mrTitleRadio: Locator;
-    private readonly mrsTitleRadio: Locator;
-    private readonly passwordInput: Locator;
-    private readonly daysSelect: Locator;
-    private readonly monthsSelect: Locator;
-    private readonly yearsSelect: Locator;
-    private readonly newsletterCheckbox: Locator;
-    private readonly specialOffersCheckbox: Locator;
+    /** Form heading locator for account information section (`getByRole`). */
+    readonly enterAccountInfoHeading: Locator;
 
-    private readonly firstNameInput: Locator;
-    private readonly lastNameInput: Locator;
-    private readonly companyInput: Locator;
-    private readonly address1Input: Locator;
-    private readonly address2Input: Locator;
-    private readonly countrySelect: Locator;
-    private readonly stateInput: Locator;
-    private readonly cityInput: Locator;
-    private readonly zipcodeInput: Locator;
-    private readonly mobileNumberInput: Locator;
-    private readonly createAccountButton: Locator;
+    /** Title radio button locator for 'Mr' (`getByRole`). */
+    readonly mrTitleRadio: Locator;
 
-    private readonly explicitWaitTimeout = ConfigReader.getExplicitWaitTimeout();
+    /** Title radio button locator for 'Mrs' (`getByRole`). */
+    readonly mrsTitleRadio: Locator;
 
-    /**
-     * Initializes locators for the registration form elements.
-     * @param page - Playwright Page fixture instance
-     */
+    /** Password input field locator (`getByTestId`). */
+    readonly passwordInput: Locator;
+
+    /** Day of birth dropdown selector locator (`getByTestId`). */
+    readonly daysSelect: Locator;
+
+    /** Month of birth dropdown selector locator (`getByTestId`). */
+    readonly monthsSelect: Locator;
+
+    /** Year of birth dropdown selector locator (`getByTestId`). */
+    readonly yearsSelect: Locator;
+
+    /** Checkbox locator for newsletter subscription opt-in (`getByTestId`). */
+    readonly newsletterCheckbox: Locator;
+
+    /** Checkbox locator for special offers opt-in (`getByTestId`). */
+    readonly specialOffersCheckbox: Locator;
+
+    /** First name input field locator (`getByTestId`). */
+    readonly firstNameInput: Locator;
+
+    /** Last name input field locator (`getByTestId`). */
+    readonly lastNameInput: Locator;
+
+    /** Company name input field locator (`getByTestId`). */
+    readonly companyInput: Locator;
+
+    /** Address line 1 input field locator (`getByTestId`). */
+    readonly address1Input: Locator;
+
+    /** Address line 2 input field locator (`getByTestId`). */
+    readonly address2Input: Locator;
+
+    /** Country dropdown selector locator (`getByTestId`). */
+    readonly countrySelect: Locator;
+
+    /** State input field locator (`getByTestId`). */
+    readonly stateInput: Locator;
+
+    /** City input field locator (`getByTestId`). */
+    readonly cityInput: Locator;
+
+    /** Zipcode input field locator (`getByTestId`). */
+    readonly zipcodeInput: Locator;
+
+    /** Mobile number input field locator (`getByTestId`). */
+    readonly mobileNumberInput: Locator;
+
+    /** Primary action button locator to submit account registration (`getByRole`). */
+    readonly createAccountButton: Locator;
+
     constructor(page: Page) {
         super(page);
-        this.enterAccountInfoHeading = page.locator('b:has-text("Enter Account Information")');
-        this.mrTitleRadio = page.locator('#id_gender1');
-        this.mrsTitleRadio = page.locator('#id_gender2');
-        this.passwordInput = page.locator('#password');
-        this.daysSelect = page.locator('#days');
-        this.monthsSelect = page.locator('#months');
-        this.yearsSelect = page.locator('#years');
+
+        // Account Information Section
+        this.enterAccountInfoHeading = page.getByRole('heading', { name: 'Enter Account Information' });
+        this.mrTitleRadio = page.getByRole('radio', { name: 'Mr.' });
+        this.mrsTitleRadio = page.getByRole('radio', { name: 'Mrs.' });
+
+        // Personal Details Fields (using data-qa test IDs)
+        this.passwordInput = page.getByTestId('password');
+        this.daysSelect = page.getByTestId('days');
+        this.monthsSelect = page.getByTestId('months');
+        this.yearsSelect = page.getByTestId('years');
         this.newsletterCheckbox = page.locator('#newsletter');
         this.specialOffersCheckbox = page.locator('#optin');
 
-        this.firstNameInput = page.locator('#first_name');
-        this.lastNameInput = page.locator('#last_name');
-        this.companyInput = page.locator('#company');
-        this.address1Input = page.locator('#address1');
-        this.address2Input = page.locator('#address2');
-        this.countrySelect = page.locator('#country');
-        this.stateInput = page.locator('#state');
-        this.cityInput = page.locator('#city');
-        this.zipcodeInput = page.locator('#zipcode');
-        this.mobileNumberInput = page.locator('#mobile_number');
-        this.createAccountButton = page.locator('button[data-qa="create-account"]');
+        // Address Details Section (using data-qa test IDs)
+        this.firstNameInput = page.getByTestId('first_name');
+        this.lastNameInput = page.getByTestId('last_name');
+        this.companyInput = page.getByTestId('company');
+        this.address1Input = page.getByTestId('address');
+        this.address2Input = page.getByTestId('address2');
+        this.countrySelect = page.getByTestId('country');
+        this.stateInput = page.getByTestId('state');
+        this.cityInput = page.getByTestId('city');
+        this.zipcodeInput = page.getByTestId('zipcode');
+        this.mobileNumberInput = page.getByTestId('mobile_number');
+
+        // Submission Action Button
+        this.createAccountButton = page.getByRole('button', { name: 'Create Account' });
     }
 
     /**
-     * Verifies if the 'ENTER ACCOUNT INFORMATION' heading is displayed.
-     * @returns Promise resolving to true if visible, false otherwise
-     */
-    async isEnterAccountInfoDisplayed(): Promise<boolean> {
-         try {
-            await this.enterAccountInfoHeading.waitFor({ state: 'visible', timeout: this.explicitWaitTimeout });
-            return true;
-        } catch {
-            return false;
-        }
-    }
-
-    /**
-     * Selects the title radio button dynamically ('Mr' or 'Mrs').
-     * @param title - The title string to select
+     * Selects the title radio button ('Mr' or 'Mrs') based on input.
+     * 
+     * @param title - Optional title string ('Mr' | 'Mrs') to select
      */
     async selectTitle(title?: 'Mr' | 'Mrs'): Promise<void> {
         if (!title) return;
@@ -118,8 +145,9 @@ export class AccountInformationPage extends BasePage {
     }
 
     /**
-     * Fills title, password, date of birth dropdowns, and selects opt-in checkboxes.
+     * Fills title, password, date of birth dropdowns, and checks opt-in options.
      * Defaults to 'Mr' if no title is specified in details.
+     * 
      * @param details - AccountInfoDetails object containing title, password, and birth date strings
      */
     async fillAccountInformation(details: AccountInfoDetails): Promise<void> {
@@ -133,7 +161,8 @@ export class AccountInformationPage extends BasePage {
     }
 
     /**
-     * Fills all user personal and billing address form fields.
+     * Fills all personal and billing address form fields.
+     * 
      * @param address - AddressInfoDetails object containing address, country, and contact details
      */
     async fillAddressInformation(address: AddressInfoDetails): Promise<void> {
@@ -151,6 +180,7 @@ export class AccountInformationPage extends BasePage {
 
     /**
      * Clicks the 'Create Account' button and navigates to the AccountCreatedPage.
+     * 
      * @returns Promise resolving to a new AccountCreatedPage instance
      */
     async clickCreateAccount(): Promise<AccountCreatedPage> {

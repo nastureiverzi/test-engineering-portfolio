@@ -4,7 +4,6 @@ import ConfigReader from '../utils/ConfigReader';
 
 /**
  * Foundation for all Page Objects.
- * Encapsulates Playwright interactions and provides shared navigation utilities.
  * Sources base URLs directly from ConfigReader to support live CLI and .env overrides.
  */
 export abstract class BasePage {
@@ -26,7 +25,7 @@ export abstract class BasePage {
         const fullUrl = `${baseUrl}${formattedPath}`;
 
         Logger.debug(`Navigating to: ${fullUrl}`);
-        await this.page.goto(fullUrl);
+        await this.page.goto(fullUrl, { waitUntil: 'domcontentloaded' });
     }
 
     /**
@@ -71,7 +70,6 @@ export abstract class BasePage {
         Logger.debug(`Visibility check returned [${visible}] for: ${locator.toString()}`);
         return visible;
     }
-
     /**
      * Selects an option from a standard HTML select element by visible text.
      * @param locator - Playwright Locator for the select dropdown
@@ -109,12 +107,10 @@ export abstract class BasePage {
      * Dismisses GDPR/Cookie consent popups if present.
      */
     protected async handleCookieConsentIfPresent(): Promise<void> {
-       const consentButton = this.page.locator(
-        'button:has-text("Consent"), button:has-text("AGREE"), button:has-text("Accept"), button:has-text("OK")'
-        ).first();
+       const consentButton = this.page.getByRole('button', { name: /consent|agree|accept|ok/i }).first();
 
         try {
-            await consentButton.waitFor({ state: 'visible', timeout: 3000 });
+            await consentButton.waitFor({ state: 'visible', timeout: ConfigReader.getExplicitWaitTimeout() });
             await consentButton.click();
             Logger.debug('Cookie consent popup detected and dismissed');
         } catch {
