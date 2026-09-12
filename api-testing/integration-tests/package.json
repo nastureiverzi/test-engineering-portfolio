@@ -1,0 +1,27 @@
+{
+  "name": "integration-tests",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:auth": "jest --testPathPattern=auth",
+    "test:bookings": "jest --testPathPattern=bookings"
+  },
+  "jest": {
+      "preset": "ts-jest",
+      "testEnvironment": "node",
+      "testMatch": ["**/*.test.ts"]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/supertest": "^7.2.1",
+    "jest": "^30.5.1",
+    "supertest": "^7.2.2",
+    "ts-jest": "^29.4.12",
+    "typescript": "^5.4.5"
+  }
+}
