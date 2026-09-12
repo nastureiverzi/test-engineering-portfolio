@@ -7,26 +7,31 @@ import { BasePage } from './BasePage';
  */
 export class CartPage extends BasePage {
 
-    /** Active breadcrumb indicator locator for the Shopping Cart page (`locator`). */
+    /** Active page heading indicator locator for the Shopping Cart page (`getByRole`). */
     readonly cartItemsHeader: Locator;
 
-    /** Locator targeting all product title links within the cart table (`locator`). */
+    /** Main shopping cart table container locator (`getByRole`). */
+    readonly cartInfoTable: Locator;
+
+    /** Locator targeting all product title links within the cart table (`getByRole`). */
     readonly cartProductNames: Locator;
 
     /**
-     * Initializes locators for shopping cart elements using direct DOM strategies
-     * to maximize selector resolution speed and minimize engine overhead.
+     * Initializes locators for shopping cart elements using strict semantic getByRole strategies.
      * 
      * @param page - Playwright Page fixture instance
      */
     constructor(page: Page) {
         super(page);
 
-        // Targeted breadcrumb lookup bypassing array filtering on all list items
-        this.cartItemsHeader = page.locator('ol.breadcrumb .active');
+        // Semantic heading locator for the cart view
+        this.cartItemsHeader = page.getByRole('heading', { name: 'Shopping Cart' });
 
-        // Direct CSS path bypassing table accessibility tree traversal
-        this.cartProductNames = page.locator('td.cart_description a');
+        // Semantic table locator for the items grid
+        this.cartInfoTable = page.getByRole('table');
+
+        // Scoped semantic row and cell locators for product description anchors
+        this.cartProductNames = this.cartInfoTable.getByRole('row').locator('td.cart_description a');
     }
 
     /**
@@ -37,5 +42,14 @@ export class CartPage extends BasePage {
     async getCartProductNames(): Promise<string[]> {
         const names = await this.cartProductNames.allInnerTexts();
         return names.map(name => name.trim());
+    }
+
+    /**
+     * Gets the total count of items listed in the cart table.
+     * 
+     * @returns Promise resolving to the number of items
+     */
+    async getCartItemCount(): Promise<number> {
+        return await this.cartProductNames.count();
     }
 }

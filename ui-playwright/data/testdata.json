@@ -63,5 +63,8 @@
   },
   "productSearch": {
     "keyword": "top"
+  },
+  "cart": {
+    "productName": "Blue Top"
   }
 }

@@ -1,21 +1,33 @@
 import { test as base } from '@playwright/test';
 
 /**
- * Extended Playwright test fixture that blocks ad network requests
- * before every test to prevent ad overlays from interfering with automation.
+ * Extended Playwright test fixture that safely blocks ad and analytics domains
+ * without accidentally killing application assets containing "ads".
  */
 export const test = base.extend({
     page: async ({ page }, use) => {
-        await page.route('**/*googlesyndication*', route => route.abort());
-        await page.route('**/*googleadservices*', route => route.abort());
-        await page.route('**/*doubleclick*', route => route.abort());
-        await page.route('**/*google-analytics*', route => route.abort());
-        await page.route('**/*adservice*', route => route.abort());
-        await page.route('**/*googletag*', route => route.abort());
-        await page.route('**/*amazon-adsystem*', route => route.abort());
-        await page.route('**/*adsystem*', route => route.abort());
-        await page.route('**/*adnxs*', route => route.abort());
-        await page.route('**/*ads*', route => route.abort());
+        const blockedDomains = [
+            'googlesyndication.com',
+            'googleadservices.com',
+            'doubleclick.net',
+            'google-analytics.com',
+            'googletagmanager.com',
+            'amazon-adsystem.com',
+            'adnxs.com',
+            'adservice.google.com',
+            'scorecardresearch.com',
+            'criteo.com'
+        ];
+
+        await page.route('**/*', (route) => {
+            const url = route.request().url();
+            const isBlocked = blockedDomains.some(domain => url.includes(domain));
+            if (isBlocked) {
+                return route.abort();
+            }
+            return route.continue();
+        });
+
         await use(page);
     }
 });

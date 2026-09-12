@@ -41,9 +41,6 @@ export class HomePage extends BasePage {
     /** All product card containers on the home page grid. */
     readonly productCards: Locator;
 
-    /** Explicit wait timeout loaded from environment configuration in milliseconds. */
-    private readonly explicitWaitTimeout = ConfigReader.getExplicitWaitTimeout();
-
     constructor(page: Page) {
         super(page);
 
@@ -55,11 +52,6 @@ export class HomePage extends BasePage {
 
         // Featured Products Grid Locators
         this.productCards = page.locator('.productinfo');
-
-        // Multi-condition CSS selector for backend exception handling
-        this.serverErrorIndicator = page.locator(
-            'h1:has-text("500"), :text("IntegrityError"), :text("Server Error"), :text("UNIQUE constraint failed")'
-        );
 
         // Cart Modal Dialog Locators
         this.modalTitle = page.getByRole('heading', { name: 'Added!' });
@@ -77,15 +69,6 @@ export class HomePage extends BasePage {
         await this.navigateTo('/');
         await this.handleCookieConsentIfPresent();
         return this;
-    }
-
-    /**
-     * Verifies if the home page branding logo is displayed.
-     * 
-     * @returns Promise resolving to true if visible, false otherwise
-     */
-    async isHomePageDisplayed(): Promise<boolean> {
-        return this.isDisplayed(this.homePageLogo);
     }
 
     /**
@@ -137,7 +120,7 @@ export class HomePage extends BasePage {
      * @returns Locator scoped to the matching product container card
      */
     getProductCardByName(productName: string): Locator {
-        return this.productCards.filter({ hasText: productName });
+       return this.page.locator('.features_items').locator('.single-products').filter({ hasText: productName });
     }
 
     /**
@@ -147,48 +130,16 @@ export class HomePage extends BasePage {
      * @param productName - Visible title of the product to add
      */
     async addProductToCartByName(productName: string): Promise<void> {
-        const card = this.getProductCardByName(productName);
-        const addToCartBtn = card.getByRole('link', { name: 'Add to cart' }).first();
+        const card = this.page
+            .locator('.features_items .single-products')
+            .filter({ hasText: productName });
 
-        await card.hover();
-        await this.click(addToCartBtn);
-        Logger.debug(`Added product [${productName}] to cart`);
-    }
+        await card.scrollIntoViewIfNeeded();
 
-    /**
-     * Checks if the 'Added!' modal header is displayed after adding an item to the cart.
-     * 
-     * @returns Promise resolving to true if visible, false otherwise
-     */
-    async isAddToCartModalTitleDisplayed(): Promise<boolean> {
-        return this.isDisplayed(this.modalTitle);
-    }
+        // getByText targets the <a> element directly regardless of missing href/role
+        const addToCartBtn = card.getByText('Add to cart').first();
 
-    /**
-     * Checks if the confirmation body message is displayed in the cart modal.
-     * 
-     * @returns Promise resolving to true if visible, false otherwise
-     */
-    async isAddToCartModalMessageDisplayed(): Promise<boolean> {
-        return this.isDisplayed(this.modalMessage);
-    }
-
-    /**
-     * Checks if the 'Continue Shopping' button is visible in the cart modal.
-     * 
-     * @returns Promise resolving to true if visible, false otherwise
-     */
-    async isContinueShoppingButtonDisplayed(): Promise<boolean> {
-        return this.isDisplayed(this.modalContinueShoppingBtn);
-    }
-
-    /**
-     * Checks if the 'View Cart' link is visible in the cart modal.
-     * 
-     * @returns Promise resolving to true if visible, false otherwise
-     */
-    async isModalViewCartLinkDisplayed(): Promise<boolean> {
-        return this.isDisplayed(this.modalViewCartLink);
+        await addToCartBtn.click({ force: true });
     }
 
     /**
