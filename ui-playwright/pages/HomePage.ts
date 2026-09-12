@@ -111,30 +111,6 @@ export class HomePage extends BasePage {
     }
 
     /**
-     * Checks whether the 'Logged in as' text badge is visible in the navigation bar.
-     * 
-     * @returns Promise resolving to true if visible, false otherwise
-     */
-    async isUserLoggedIn(): Promise<boolean> {
-        return this.isDisplayed(this.loggedInAsText);
-    }
-
-    /**
-     * Verifies that the navigation bar displays the expected logged-in username.
-     * 
-     * @param username - Expected username string to assert against
-     * @returns Promise resolving to true if the badge contains the username
-     */
-    async isLoggedInAsDisplayed(username: string): Promise<boolean> {
-        await this.loggedInAsText.waitFor({ state: 'visible', timeout: this.explicitWaitTimeout });
-        if (!await this.isDisplayed(this.loggedInAsText)) {
-            return false;
-        }
-        const text = await this.getText(this.loggedInAsText);
-        return text.includes(username);
-    }
-
-    /**
      * Retrieves the complete text string from the 'Logged in as [username]' navigation item.
      * 
      * @returns Promise resolving to the full badge text string
@@ -151,18 +127,6 @@ export class HomePage extends BasePage {
      */
     getLoggedInAsLocator(username: string): Locator {
         return this.page.getByText(`Logged in as ${username}`);
-    }
-
-    /**
-     * Checks whether a 500 or unhandled backend database exception page is displayed.
-     * 
-     * @returns Promise resolving to true if server error indicators are detected
-     */
-    async isServerErrorPageDisplayed(): Promise<boolean> {
-        const title = await this.page.title();
-        const titleContainsError = title.toLowerCase().includes('500') || title.toLowerCase().includes('integrityerror');
-        
-        return titleContainsError || await this.isDisplayed(this.serverErrorIndicator);
     }
 
     /**

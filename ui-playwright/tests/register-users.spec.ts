@@ -7,24 +7,35 @@ import TestDataGenerator from '../utils/TestDataGenerator';
 test.describe('Registration Test Suite', () => {
 
     /**
-     * Test Case 1: Register User
+     * TC-001 — Successful signup and account creation
      * 
-     * 1. Launch browser
-     * 2. Navigate to homepage
-     * 3. Verify that home page is visible successfully
-     * 4. Click on 'Signup / Login' button
-     * 5. Verify 'New User Signup!' is visible
-     * 6. Enter name and email address
-     * 7. Click 'Signup' button
-     * 8. Verify that 'ENTER ACCOUNT INFORMATION' is visible
-     * 9. Fill details: Title, Name, Email, Password, Date of birth
-     * 10. Select checkbox 'Sign up for our newsletter!'
-     * 11. Select checkbox 'Receive special offers from our partners!'
-     * 12. Fill details: First name, Last name, Company, Address, Address2, Country, State, City, Zipcode, Mobile Number
-     * 13. Click 'Create Account' button
-     * 14. Verify that 'ACCOUNT CREATED!' is visible
-     * 15. Click 'Continue' button
-     * 16. Verify that 'Logged in as username' is visible
+     * Pre-conditions:
+     *   - User is not logged in
+     *   - Email is not registered
+     * 
+     * Test Data:
+     *   - Username: testAccount
+     *   - Email: testuser123.qa@gmail.com
+     *   - Password: testPass
+     *   - First Name: Test / Last Name: User
+     *   - DOB: 15/May/1990
+     *   - Address: 123 Test Street, Test City, Test State, 12345, US
+     *   - Mobile: 1234567890
+     * 
+     * Steps:
+     *   1. Navigate to homepage
+     *   2. Click "Signup / Login" in the top navigation menu
+     *   3. In the "New User Signup!" section, enter username and email
+     *   4. Click "Signup"
+     *   5. Fill in all required account information fields (Title, Password, DOB)
+     *   6. Fill in all required address fields (Name, Address, Country, State, City, Zipcode, Mobile)
+     *   7. Click "Create Account"
+     *   8. Click "Continue"
+     * 
+     * Expected Result:
+     *   - After step 7, "Account Created!" page is displayed
+     *   - After step 8, user is redirected to the homepage
+     *   - "Logged in as testAccount" appears in the top navigation bar
      */
     test('TC-001: Register User with valid details', { tag: '@registration' }, async ({ page }) => {
 
@@ -81,16 +92,24 @@ test.describe('Registration Test Suite', () => {
     });
 
     /**
-     * Test Case 2: Register User with already registered email
+     * TC-002 — Registration with already registered email
      * 
-     * 1. Launch browser
-     * 2. Navigate to homepage
-     * 3. Verify that home page is visible successfully
-     * 4. Click on 'Signup / Login' button
-     * 5. Verify 'New User Signup!' is visible
-     * 6. Enter name and already registered email address
-     * 7. Click 'Signup' button
-     * 8. Verify error 'Email Address already exist!' is visible
+     * Pre-conditions:
+     *   - User is not logged in
+     * 
+     * Test Data:
+     *   - Username: testAccount
+     *   - Email: testuser123.qa@gmail.com (already registered)
+     * 
+     * Steps:
+     *   1. Navigate to homepage
+     *   2. Click "Signup / Login" in the top navigation menu
+     *   3. In the "New User Signup!" section, enter username and the already registered email
+     *   4. Click "Signup"
+     * 
+     * Expected Result:
+     *   - After step 4, a red error message is displayed below the signup form indicating the email already exists
+     *   - User remains on the registration page
      */
     test('TC-002: Register User with already registered email', { tag: '@registration' }, async ({ page }) => {
 
@@ -117,16 +136,26 @@ test.describe('Registration Test Suite', () => {
     });
 
     /**
-     * Test Case 3: Registration with missing @ symbol in email
+     * TC-003 — Registration with missing @ symbol in email
      * 
-     * 1. Launch browser
-     * 2. Navigate to homepage
-     * 3. Verify that home page is visible successfully
-     * 4. Click on 'Signup / Login' button
-     * 5. Verify 'New User Signup!' is visible
-     * 6. Enter username and malformed email address (missing @)
-     * 7. Click 'Signup' button
-     * 8. Verify browser displays native HTML5 validation message for missing @ symbol
+     * Pre-conditions:
+     *   - User is not logged in
+     *   - Email is not registered
+     * 
+     * Test Data:
+     *   - Username: testAccount
+     *   - Email: test124.gmail.com
+     * 
+     * Steps:
+     *   1. Navigate to homepage
+     *   2. Click "Signup / Login" in the top navigation menu
+     *   3. In the "New User Signup!" section, enter username and the malformed email
+     *   4. Click "Signup"
+     * 
+     * Expected Result:
+     *   - After step 4, browser displays a native HTML5 tooltip next to the email field indicating the @ symbol is missing
+     *   - No network request is sent
+     *   - User remains on the registration page
      */
     test('TC-003: Registration with missing @ symbol in email', { tag: '@registration' }, async ({ page }) => {
 
@@ -153,18 +182,27 @@ test.describe('Registration Test Suite', () => {
         ).toMatch(/@|email|address/i);
     });
 
-    /**
-     * Test Case 4: Registration with missing email domain
+   /**
+     * TC-004 — Registration with missing email domain
      * 
-     * 1. Launch browser
-     * 2. Navigate to homepage
-     * 3. Verify that home page is visible successfully
-     * 4. Click on 'Signup / Login' button
-     * 5. Verify 'New User Signup!' is visible
-     * 6. Enter username and malformed email address (missing domain suffix, e.g. test124@gmail)
-     * 7. Click 'Signup' button
-     * 8. Verify validation message is displayed and user remains on registration page
+     * Pre-conditions:
+     *   - User is not logged in
+     *   - Email is not registered
      * 
+     * Test Data:
+     *   - Username: testAccount
+     *   - Email: test124@gmail
+     * 
+     * Steps:
+     *   1. Navigate to homepage
+     *   2. Click "Signup / Login" in the top navigation menu
+     *   3. In the "New User Signup!" section, enter username and the malformed email
+     *   4. Click "Signup"
+     * 
+     * Expected Result:
+     *   - After step 4, browser or application displays a validation message indicating the email is invalid
+     *   - User remains on the registration page
+     *
      * Known Bug: Native browser validation fails to catch missing TLD/domain suffix 
      * and redirects to AccountInformationPage instead of showing an error.
      */
@@ -197,16 +235,25 @@ test.describe('Registration Test Suite', () => {
     });
 
     /**
-     * Test Case 5: Registration with empty username field
+     * TC-005 — Registration with empty username field
      * 
-     * 1. Launch browser
-     * 2. Navigate to homepage
-     * 3. Verify that home page is visible successfully
-     * 4. Click on 'Signup / Login' button
-     * 5. Verify 'New User Signup!' is visible
-     * 6. Leave username empty and enter email address
-     * 7. Click 'Signup' button
-     * 8. Verify browser displays native HTML5 tooltip requiring the username field
+     * Pre-conditions:
+     *   - User is not logged in
+     *   - Email is not registered
+     * 
+     * Test Data:
+     *   - Username: (empty)
+     *   - Email: test124@gmail.com
+     * 
+     * Steps:
+     *   1. Navigate to homepage
+     *   2. Click "Signup / Login" in the top navigation menu
+     *   3. In the "New User Signup!" section, leave the username field empty and enter a valid email
+     *   4. Click "Signup"
+     * 
+     * Expected Result:
+     *   - After step 4, browser displays a tooltip next to the username field indicating the field is required
+     *   - User remains on the registration page
      */
     test('TC-005: Registration with empty username field', { tag: '@registration' }, async ({ page }) => {
 
@@ -233,5 +280,89 @@ test.describe('Registration Test Suite', () => {
         ).toBeTruthy();
 
         await expect(signupLoginPage.newUserSignupHeader, 'User should remain on the registration page').toBeVisible();
+    });
+
+    /**
+     * TC-011 — Multi-click submission on registration
+     * 
+     * Pre-conditions:
+     *   - User is not logged in
+     *   - Email is not registered
+     * 
+     * Test Data:
+     *   - Username: testAccount
+     *   - Email: testuser123.qa+1@gmail.com
+     *   - Password: testPass
+     *   - First Name: Test / Last Name: Registration
+     *   - DOB: 1/January/1987
+     *   - Address: 456 Street, Moody, Alabama, 35004, US
+     *   - Mobile: 345678901
+     * 
+     * Steps:
+     *   1. Navigate to homepage
+     *   2. Click "Signup / Login" in the top navigation menu
+     *   3. Enter username and email in the "New User Signup!" section and click "Signup"
+     *   4. Fill in all required account and address fields
+     *   5. Click "Create Account" 5 times in quick succession
+     * 
+     * Expected Result:
+     *   - First click submits the registration request
+     *   - Button is disabled or debounced after the first click to prevent duplicate submissions
+     *   - "Account Created!" page is displayed once
+     */
+   test('TC-011: Multi-click submission on registration', { tag: ['@registration', '@known-bugs'] }, async ({ page }) => {
+
+        const homePage = new HomePage(page);
+        const userData = TestDataManager.getObject<UserRegistrationData>('userRegistration');
+        const email = TestDataGenerator.generateEmail('qa_multiclick');
+
+        // Step 1: Navigate and verify home page
+        await homePage.open();
+        await expect(homePage.homePageLogo, 'Home page logo should be visible').toBeVisible();
+
+        // Step 2: Click "Signup / Login" and verify header
+        const signupLoginPage = await homePage.clickSignupLogin();
+        await expect(signupLoginPage.newUserSignupHeader, "'New User Signup!' header should be displayed").toBeVisible();
+
+        // Step 3: Enter username and email, click Signup
+        await signupLoginPage.enterSignupDetails(userData.name, email);
+        const accountInfoPage = await signupLoginPage.clickSignup();
+
+        // Step 4: Fill all required account and address fields
+        await accountInfoPage.fillAccountInformation({
+            title: userData.title,
+            password: userData.password,
+            day: userData.dobDay,
+            month: userData.dobMonth,
+            year: userData.dobYear
+        });
+
+        await accountInfoPage.fillAddressInformation({
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            company: userData.company,
+            address1: userData.address1,
+            address2: userData.address2,
+            country: userData.country,
+            state: userData.state,
+            city: userData.city,
+            zipcode: userData.zipcode,
+            mobileNumber: userData.mobileNumber
+        });
+
+        // Steps 5 & 6: Click Create Account and immediately check disabled state in same JS frame
+        // BUG-002: Button is not debounced — duplicate requests trigger 500 IntegrityError
+        // This test is expected to FAIL until BUG-002 is resolved
+        const isDisabled = await accountInfoPage.createAccountButton.evaluate(
+            (btn: HTMLButtonElement) => {
+                btn.click();
+                return btn.disabled;
+            }
+        );
+
+        expect(
+            isDisabled,
+            'BUG-002: Button should be disabled after first click to prevent duplicate submissions'
+        ).toBe(true);
     });
 });
