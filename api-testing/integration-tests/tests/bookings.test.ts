@@ -48,6 +48,7 @@ describe('Bookings', () => {
             const response = await request(BASE_URL)
                 .post('/booking')
                 .set('Content-Type', 'application/json')
+                .set('Accept', 'application/json')
                 .send(bookingPayload);
 
             expect(response.status).toBe(200);
@@ -68,6 +69,7 @@ describe('Bookings', () => {
             const response = await request(BASE_URL)
                 .post('/booking')
                 .set('Content-Type', 'application/json')
+                .set('Accept', 'application/json')
                 .send({
                     lastname: 'Botas',
                     totalprice: 300,
@@ -85,6 +87,7 @@ describe('Bookings', () => {
             const response = await request(BASE_URL)
                 .post('/booking')
                 .set('Content-Type', 'application/json')
+                .set('Accept', 'application/json')
                 .send({
                     firstname: "Robert'; DROP TABLE bookings;--",
                     lastname: 'SqlInjection',
@@ -107,6 +110,7 @@ describe('Bookings', () => {
             const response = await request(BASE_URL)
                 .post('/booking')
                 .set('Content-Type', 'application/json')
+                .set('Accept', 'application/json')
                 .send({
                     firstname: 'Robert',
                     lastname: 'Doe',
@@ -128,7 +132,8 @@ describe('Bookings', () => {
         it('should return booking by ID', async () => {
             const response = await request(BASE_URL)
                 .get(`/booking/${bookingId}`)
-                .set('Content-Type', 'application/json');
+                .set('Content-Type', 'application/json')
+                .set('Accept', 'application/json');
 
             expect(response.status).toBe(200);
             expect(response.body.firstname).toBeDefined();
