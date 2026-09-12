@@ -90,20 +90,6 @@ public class HomePage extends BasePage {
     }
 
     /**
-     * Checks if the application returned a 500 or unhandled exception page.
-     *
-     * @return true if a server error page is detected
-     */
-    public boolean isServerErrorPageDisplayed() {
-        boolean titleContainsError = Optional.ofNullable(driver.getTitle())
-                .map(String::toLowerCase)
-                .filter(title -> title.contains("500") || title.contains("integrityerror"))
-                .isPresent();
-
-        return titleContainsError || isDisplayed(serverErrorIndicator);
-    }
-
-    /**
      * Navigates to the Products page via top menu.
      *
      * @return ProductsPage instance

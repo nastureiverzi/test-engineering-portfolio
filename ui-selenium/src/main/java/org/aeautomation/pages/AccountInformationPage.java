@@ -131,36 +131,22 @@ public class AccountInformationPage extends BasePage {
     }
 
     /**
-     * Clicks the 'Create Account' button multiple times in rapid succession.
-     * Useful for testing debouncing and duplicate submission prevention.
+     * Clicks the Create Account button once and checks if it becomes disabled.
+     * Used to verify debounce behavior
      *
-     * @param times Number of rapid clicks to perform
+     * @return true if button is disabled after click, false if still enabled
      */
-    public void clickCreateAccountMultipleTimes(int times) {
-        log.info("Dispatching {} rapid raw XHR POST requests to reproduce server race condition", times);
-        WebElement button = waitForClickability(createAccountButton);
+    public boolean clickCreateAccountAndCheckDisabled() {
+        WebElement button = driver.findElement(createAccountButton);
 
-        String xhrMultiPostScript =
-                "var btn = arguments[0];" +
-                        "var form = btn.closest('form');" +
-                        "var actionUrl = form.getAttribute('action') || window.location.href;" +
-                        "var count = arguments[1];" +
-
-                        // Build key-value URL-encoded string to match native browser form submit
-                        "var formData = new FormData(form);" +
-                        "var params = new URLSearchParams(formData).toString();" +
-
-                        // Fire rapid XHRs synchronously in the same JS frame microtask
-                        "for (var i = 0; i < count; i++) {" +
-                        "    var xhr = new XMLHttpRequest();" +
-                        "    xhr.open('POST', actionUrl, true);" +
-                        "    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');" +
-                        "    xhr.send(params);" +
-                        "}" +
-
-                        // Submit form natively on the main thread so browser navigates to the result page
-                        "form.submit();";
-
-        ((JavascriptExecutor) driver).executeScript(xhrMultiPostScript, button, times);
+        // Execute click and check disabled state in the same JS call
+        // before the page has a chance to navigate
+        Boolean isDisabled = (Boolean) ((JavascriptExecutor) driver)
+                .executeScript(
+                        "arguments[0].click();" +
+                                "return arguments[0].disabled;",
+                        button
+                );
+        return Boolean.TRUE.equals(isDisabled);
     }
 }

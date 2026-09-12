@@ -7,8 +7,11 @@ import org.aeautomation.utils.TestDataGenerator;
 import org.aeautomation.utils.TestDataManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.JavascriptExecutor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.awt.*;
 
 /**
  * Test Suite verifying the user account creation and registration workflows.
@@ -184,7 +187,7 @@ public class RegisterUserTests extends BaseTest {
     @Test(description = "TC-004: Registration with missing email domain — documents known validation bug",
             groups = {"known-bugs"})
     public void testRegistrationMissingEmailDomain() {
-        log.warn("TC-004: Known bug BUG-002 — asserting inverted behaviour, this test is expected to FAIL");
+        log.warn("TC-004: Known bug BUG-001 — asserting inverted behaviour, this test is expected to FAIL");
         UserCredentialsData data = TestDataManager.getObject("invalidRegistration.missingDomain", UserCredentialsData.class);
 
         // Step 1: Navigate to home page
@@ -258,24 +261,15 @@ public class RegisterUserTests extends BaseTest {
      * - First click submits the form
      * - Button is disabled or debounced after first click
      * - "Account Created!" page is displayed once
-     * NOTE ON AUTOMATION APPROACH:
-     * True rapid multi-click simulation is not reliably achievable with Selenium WebDriver
-     * due to its sequential execution model.
-     * This bug (BUG-002) was identified and documented through manual exploratory testing.
-     * The automated test below verifies the bug exists by checking for the 500 error page
-     * using the XHR approach to fire concurrent requests — which tests the backend race
-     * condition directly, even if it bypasses the UI layer.
-     * A proper fix would require debouncing at both the UI level (disable button after click)
-     * and backend level (idempotency check before database insert).
      */
-    @Test(description = "TC-011: Multi-click on Create Account triggers 500 error — documents known bug",
+    @Test(description = "TC-011: Create Account button not disabled after first click — documents known bug",
             groups = {"known-bugs"})
     public void testMultiClickRegistrationSubmit() {
-        log.warn("TC-011: Known bug BUG-002 — asserting inverted behaviour, this test is expected to FAIL");
+        log.warn("TC-011: Known bug BUG-002 — this test is expected to FAIL");
 
         UserRegistrationData userData = TestDataManager.getObject("userRegistration", UserRegistrationData.class);
-        String dynamicEmail = TestDataGenerator.generateEmail("qa_multiclick");
-        log.info("TC-011: Attempting multi-click registration with email: [{}]", dynamicEmail);
+        String dynamicEmail = TestDataGenerator.generateEmail("qa_multi");
+        log.info("TC-011: Attempting registration with email: [{}]", dynamicEmail);
 
         // Step 1: Navigate to home page
         HomePage homePage = new HomePage();
@@ -293,19 +287,12 @@ public class RegisterUserTests extends BaseTest {
                 .selectDateOfBirth(userData.dobDay(), userData.dobMonth(), userData.dobYear())
                 .fillAddressDetails(userData);
 
-        // Step 5: Click "Create Account" 5 times in quick succession
-        infoPage.clickCreateAccountMultipleTimes(5);
-
-        // Verification 1: Confirm server did not return 500 error page
-        Assert.assertFalse(
-                homePage.isServerErrorPageDisplayed(),
-                "BUG DETECTED [TC-011]: Multi-click triggered 500 Internal Server Error due to missing button debouncing!"
-        );
-
-        // Verification 2: Account Created page should be shown
+        // Step 5 & 6: Click Create Account and verify button is disabled — fails due to BUG-001
+        // BUG-002: Button is not debounced — duplicate requests trigger 500 IntegrityError
+        // This test is expected to FAIL until BUG-002 is resolved
         Assert.assertTrue(
-                signupLoginPage.getCurrentUrl().contains("/account_created"),
-                "BUG-002 may be fixed — Account Created page was reached."
+                infoPage.clickCreateAccountAndCheckDisabled(),
+                "BUG-001: Button should be disabled after first click to prevent duplicate submissions"
         );
     }
 }
