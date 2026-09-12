@@ -44,15 +44,6 @@ export class ProductsPage extends BasePage {
     }
 
     /**
-     * Verifies if the 'SEARCHED PRODUCTS' section header is displayed.
-     * 
-     * @returns Promise resolving to true if visible, false otherwise
-     */
-    async isSearchedProductsHeaderDisplayed(): Promise<boolean> {
-        return this.isDisplayed(this.searchedProductsHeader);
-    }
-
-    /**
      * Retrieves the text strings of all displayed product names on the page.
      * 
      * @returns Promise resolving to an array of trimmed product name strings
