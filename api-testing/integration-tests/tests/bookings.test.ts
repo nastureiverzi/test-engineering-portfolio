@@ -94,7 +94,6 @@ describe('Bookings', () => {
          * @note KNOWN BUG: The API returns HTTP 500 instead of HTTP 400 Bad Request for missing required fields.
          */
         it('should return 500 for missing required field', async () => {
-            // BUG: API returns 500 instead of 400 for missing required field
             const response = await request(Config.baseUrl)
                 .post('/booking')
                 .set('Content-Type', 'application/json')
@@ -126,7 +125,6 @@ describe('Bookings', () => {
          * @note KNOWN BUG: The API accepts invalid types with HTTP 200 and converts invalid values to null instead of rejecting them with HTTP 400.
          */
         it('should accept invalid data type and save as null', async () => {
-            // BUG: API returns 200 and saves null instead of rejecting invalid data type
             const response = await request(Config.baseUrl)
                 .post('/booking')
                 .set('Content-Type', 'application/json')
