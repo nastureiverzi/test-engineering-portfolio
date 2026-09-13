@@ -1,0 +1,59 @@
+{
+    "validBooking": {
+        "firstname": "Raluca",
+        "lastname": "Botas",
+        "totalprice": 300,
+        "depositpaid": true,
+        "bookingdates": {
+            "checkin": "2025-03-30",
+            "checkout": "2025-04-03"
+        },
+        "additionalneeds": "Breakfast"
+    },
+    "updatedBooking": {
+        "firstname": "Updated",
+        "lastname": "Test",
+        "totalprice": 200,
+        "depositpaid": true,
+        "bookingdates": {
+            "checkin": "2025-04-30",
+            "checkout": "2025-05-03"
+        },
+        "additionalneeds": "Dinner"
+    },
+    "partialUpdate": {
+        "firstname": "MyCat",
+        "lastname": "IsAmazing"
+    },
+    "sqlInjection": {
+        "firstname": "Robert'; DROP TABLE bookings;--",
+        "lastname": "SqlInjection",
+        "totalprice": 300,
+        "depositpaid": true,
+        "bookingdates": {
+            "checkin": "2025-03-30",
+            "checkout": "2025-04-03"
+        },
+        "additionalneeds": "Dinner"
+    },
+    "invalidDataType": {
+        "firstname": "Robert",
+        "lastname": "Doe",
+        "totalprice": "all the dollars",
+        "depositpaid": true,
+        "bookingdates": {
+            "checkin": "2025-03-30",
+            "checkout": "2025-04-03"
+        },
+        "additionalneeds": "Breakfast"
+    },
+    "missingFirstname": {
+        "lastname": "Botas",
+        "totalprice": 300,
+        "depositpaid": true,
+        "bookingdates": {
+            "checkin": "2025-03-30",
+            "checkout": "2025-04-03"
+        }
+    }
+}

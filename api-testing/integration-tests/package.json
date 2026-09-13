@@ -5,12 +5,27 @@
   "scripts": {
     "test": "jest",
     "test:auth": "jest --testPathPattern=auth",
-    "test:bookings": "jest --testPathPattern=bookings"
+    "test:bookings": "jest --testPathPattern=bookings",
+    "report": "start reports/test-report.html"
   },
   "jest": {
-      "preset": "ts-jest",
-      "testEnvironment": "node",
-      "testMatch": ["**/*.test.ts"]
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/*.test.ts"
+    ],
+    "reporters": [
+      "default",
+      [
+        "jest-html-reporter",
+        {
+          "pageTitle": "Restful Booker API Test Report",
+          "outputPath": "reports/test-report.html",
+          "includeFailureMsg": true,
+          "includeSuiteFailure": true
+        }
+      ]
+    ]
   },
   "keywords": [],
   "author": "",
@@ -19,7 +34,9 @@
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/supertest": "^7.2.1",
+    "dotenv": "^17.4.2",
     "jest": "^30.5.1",
+    "jest-html-reporter": "^4.4.2",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.12",
     "typescript": "^5.4.5"
