@@ -154,4 +154,5 @@ API_USERNAME=testuser API_PASSWORD=testpass npm test    # custom credentials
 > Or update `.env` directly with the values you need before running `npm test`.
 
 > All other settings are configured via `.env` — see `.env.example`.
-> Postman: import collection and environment from `collections/`
+
+> **Postman:** import collection and environment from `collections/`
