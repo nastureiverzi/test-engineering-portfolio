@@ -124,6 +124,34 @@ BASE_URL=https://staging.myapp.com HEADLESS=true npm test      # combined
 
 > All other settings (`TEST_EMAIL_DOMAIN`, `LOG_LEVEL`) are configured via `.env` — see `.env.example`.
 
-`api-testing/`
-- Supertest: `npm test`
-- Postman: import collection from `collections/`
+### `api-testing/`
+
+> First time setup: `cd integration-tests && npm install`, then copy `.env.example` to `.env`.
+> The example file contains working default values and can be used as-is to run the suite against the Restful Booker API.
+
+**Using npm scripts:**
+
+```bash
+npm test                    # run all API tests
+npm run test:auth           # authentication tests only
+npm run test:bookings       # bookings CRUD tests only
+npm run report              # open last HTML test report
+```
+
+**With environment variable overrides (Linux/macOS/Git Bash):**
+
+```bash
+BASE_URL=https://staging.example.com npm test          # custom base URL
+API_USERNAME=testuser API_PASSWORD=testpass npm test    # custom credentials
+```
+
+> **Windows PowerShell/CMD users:** Inline environment variable syntax is not supported. Use one of these alternatives instead:
+>
+> Set the variable first, then run:
+> ```powershell
+> $env:BASE_URL="https://staging.example.com"; npm test
+> ```
+> Or update `.env` directly with the values you need before running `npm test`.
+
+> All other settings are configured via `.env` — see `.env.example`.
+> Postman: import collection and environment from `collections/`
