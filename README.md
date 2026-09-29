@@ -155,4 +155,6 @@ API_USERNAME=testuser API_PASSWORD=testpass npm test    # custom credentials
 
 > All other settings are configured via `.env` — see `.env.example`.
 
+### Postman
+
 > **Postman:** import collection and environment from `collections/`
